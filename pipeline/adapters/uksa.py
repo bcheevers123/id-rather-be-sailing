@@ -15,9 +15,9 @@ USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.co
 
 COURSE_URLS = {
     "pst": "https://www.uksa.org/course/personal-survival-techniques/",
-    "fpff": "https://www.uksa.org/course/fire-prevention-and-fire-fighting/",
+    "fpff": "https://www.uksa.org/course/fire-fighting-and-fire-prevention/",
     "efa": "https://www.uksa.org/course/elementary-first-aid/",
-    "pssr": "https://www.uksa.org/course/personal-safety-and-social-responsibility/",
+    # UKSA does not list PSSR as a standalone course; omitted
 }
 
 # Match date strings like "10 August 2026" or "10 Aug 2026"
