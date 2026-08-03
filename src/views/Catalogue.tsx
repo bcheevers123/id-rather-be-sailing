@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../hooks/useData'
 import { buildSearchIndex, searchCourses } from '../lib/search'
@@ -14,22 +14,113 @@ const CATEGORY_ORDER: CourseCategory[] = [
 ]
 
 const CATEGORY_LABELS: Record<CourseCategory, string> = {
-  stcw_basic: 'STCW Basic Training',
-  stcw_advanced: 'STCW Advanced Training',
-  stcw_refresher: 'Updating STCW Training',
-  stcw_tanker: 'Tanker Training',
-  stcw_igf: 'IGF Code Training (Alternative Fuels)',
-  stcw_helm: 'HELM — Leadership & Management',
+  stcw_basic:       'STCW Basic Safety Training',
+  stcw_advanced:    'STCW Advanced Training',
+  stcw_refresher:   'Updating STCW Training',
+  stcw_tanker:      'Tanker Training',
+  stcw_igf:         'IGF Code (Alternative Fuels)',
+  stcw_helm:        'HELM — Leadership & Management',
   stcw_ecdis_naest: 'ECDIS & NAEST',
-  gmdss: 'GMDSS / Radio',
-  high_voltage: 'High Voltage',
-  security: 'Security Training',
-  deck_yacht: 'Deck Yacht Modules',
-  sv_engineering: 'Small Vessel Engineering Modules',
-  engineering_other: 'Non-STCW Engineering',
-  polar: 'Polar Waters Training',
-  workboat: 'Workboat Courses',
-  other: 'Other MCA-approved Training',
+  gmdss:            'GMDSS / Radio',
+  high_voltage:     'High Voltage',
+  security:         'Security Training',
+  deck_yacht:       'Deck Yacht Modules',
+  sv_engineering:   'Small Vessel Engineering',
+  engineering_other:'Non-STCW Engineering',
+  polar:            'Polar Waters',
+  workboat:         'Workboat',
+  other:            'Other MCA-approved',
+}
+
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" aria-hidden="true"
+      style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 180ms cubic-bezier(0.4,0,0.2,1)', flexShrink: 0 }}
+    >
+      <path d="M3 6l5 5 5-5"/>
+    </svg>
+  )
+}
+
+function AccordionSection({
+  cat, courses, isOpen, onToggle,
+}: {
+  cat: CourseCategory
+  courses: any[]
+  isOpen: boolean
+  onToggle: () => void
+}) {
+  const bodyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = bodyRef.current
+    if (!el) return
+    if (isOpen) {
+      el.style.height = el.scrollHeight + 'px'
+      const t = setTimeout(() => { el.style.height = 'auto' }, 200)
+      return () => clearTimeout(t)
+    } else {
+      el.style.height = el.scrollHeight + 'px'
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { el.style.height = '0' })
+      })
+    }
+  }, [isOpen])
+
+  return (
+    <div style={{
+      border: '1px solid var(--border)',
+      borderRadius: '8px',
+      overflow: 'hidden',
+      background: 'var(--surface)',
+    }}>
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.75rem 1rem',
+          background: isOpen ? 'var(--surface-2)' : 'var(--surface)',
+          textAlign: 'left',
+          cursor: 'pointer',
+          border: 'none',
+          transition: 'background 120ms',
+          gap: '0.5rem',
+        }}
+        className="hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-inset"
+      >
+        <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>
+          {CATEGORY_LABELS[cat]}
+        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span style={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            color: 'var(--ink-muted)',
+            background: 'var(--surface-3)',
+            borderRadius: '999px',
+            padding: '0.1rem 0.55rem',
+          }}>
+            {courses.length}
+          </span>
+          <ChevronIcon open={isOpen} />
+        </div>
+      </button>
+      <div
+        ref={bodyRef}
+        style={{ height: 0, overflow: 'hidden', transition: 'height 180ms cubic-bezier(0.4,0,0.2,1)' }}
+      >
+        <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {courses.map(course => <CourseCard key={course.id} course={course} />)}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function Catalogue() {
@@ -61,61 +152,98 @@ export function Catalogue() {
     })
   }
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading courses…</div>
-  if (error) return <div className="p-8 text-center text-red-600">Failed to load data: {error}</div>
+  const coursesByCategory = useMemo(() => {
+    const map = new Map<CourseCategory, typeof courses>()
+    for (const course of courses) {
+      const arr = map.get(course.category) ?? []
+      arr.push(course)
+      map.set(course.category, arr)
+    }
+    return map
+  }, [courses])
 
-  const coursesByCategory = new Map<CourseCategory, typeof courses>()
-  for (const course of courses) {
-    const arr = coursesByCategory.get(course.category) ?? []
-    arr.push(course)
-    coursesByCategory.set(course.category, arr)
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-12">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} style={{
+              height: '52px',
+              borderRadius: '8px',
+              background: 'var(--surface-3)',
+              animation: 'pulse 1.5s ease-in-out infinite',
+              animationDelay: `${i * 80}ms`,
+            }} />
+          ))}
+        </div>
+        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-12 text-center">
+        <div role="alert" style={{
+          background: 'var(--danger-tint)',
+          border: '1px solid oklch(80% 0.08 22)',
+          borderRadius: '8px',
+          padding: '1.25rem',
+          color: 'oklch(35% 0.14 22)',
+        }}>
+          <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Failed to load data</p>
+          <p style={{ fontSize: '0.875rem' }}>{error}</p>
+        </div>
+      </main>
+    )
   }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">MCA-Approved Maritime Training</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Browse every course found in the official MCA approved training providers list.
-        Approval status is authoritative; schedule availability varies by provider.
-      </p>
+      {/* Page header */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.375rem' }}>
+          MCA-Approved Maritime Training
+        </h1>
+        <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', maxWidth: '60ch' }}>
+          Every course in the official MCA approved training providers list.
+          Approval status is authoritative; schedule availability varies by provider.
+        </p>
+      </div>
 
-      <SearchBar value={query} onChange={setQuery} placeholder="Search by course name, abbreviation…" />
+      <SearchBar value={query} onChange={setQuery} placeholder="Search by course name or abbreviation…" />
 
       {searchResults !== null ? (
-        <section aria-label="Search results" className="mt-6">
-          <p className="text-sm text-gray-500 mb-3">
-            {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} for "{query}"
+        <section aria-label="Search results" style={{ marginTop: '1.5rem' }}>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', marginBottom: '0.75rem' }}>
+            {searchResults.length === 0
+              ? `No results for "${query}"`
+              : `${searchResults.length} result${searchResults.length !== 1 ? 's' : ''} for "${query}"`
+            }
           </p>
           {searchResults.length === 0 ? (
-            <p className="text-gray-400">No courses match your search. Try a different term or browse by category below.</p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--ink-faint)' }}>
+              Try a different term or browse by category below.
+            </p>
           ) : (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {searchResults.map(course => <CourseCard key={course.id} course={course} />)}
             </div>
           )}
         </section>
       ) : (
-        <div className="mt-6 space-y-2">
+        <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {CATEGORY_ORDER.map(cat => {
             const catCourses = coursesByCategory.get(cat) ?? []
             if (catCourses.length === 0) return null
-            const isOpen = openCategories.has(cat)
             return (
-              <div key={cat} className="rounded-lg border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => toggleCategory(cat)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left font-medium text-gray-900 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-navy-600"
-                >
-                  <span>{CATEGORY_LABELS[cat]}</span>
-                  <span className="ml-2 text-sm text-gray-500">{catCourses.length} course{catCourses.length !== 1 ? 's' : ''}</span>
-                </button>
-                {isOpen && (
-                  <div className="divide-y divide-gray-100 px-4 py-2 space-y-2">
-                    {catCourses.map(course => <CourseCard key={course.id} course={course} />)}
-                  </div>
-                )}
-              </div>
+              <AccordionSection
+                key={cat}
+                cat={cat}
+                courses={catCourses}
+                isOpen={openCategories.has(cat)}
+                onToggle={() => toggleCategory(cat)}
+              />
             )
           })}
         </div>

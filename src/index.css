@@ -1,3 +1,151 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --ink:          oklch(18% 0.04 240);
+    --ink-muted:    oklch(42% 0.04 240);
+    --ink-faint:    oklch(58% 0.03 240);
+    --surface:      oklch(99% 0.005 240);
+    --surface-2:    oklch(96% 0.008 240);
+    --surface-3:    oklch(92% 0.01 240);
+    --border:       oklch(88% 0.012 240);
+    --border-strong:oklch(75% 0.02 240);
+    --accent:       oklch(52% 0.18 185);
+    --accent-dim:   oklch(42% 0.15 185);
+    --accent-tint:  oklch(95% 0.04 185);
+    --success:      oklch(52% 0.16 152);
+    --success-tint: oklch(95% 0.05 152);
+    --warn:         oklch(62% 0.16 72);
+    --warn-tint:    oklch(96% 0.06 72);
+    --danger:       oklch(52% 0.18 22);
+    --danger-tint:  oklch(96% 0.05 22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    color: var(--ink);
+    background: var(--surface);
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { color: var(--accent-dim); }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .badge::before {
+    content: '';
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+  .badge-verified  { background: var(--success-tint); color: oklch(35% 0.14 152); }
+  .badge-recent    { background: var(--warn-tint);    color: oklch(42% 0.14 72);  }
+  .badge-stale     { background: var(--warn-tint);    color: oklch(42% 0.14 50);  }
+  .badge-unavail   { background: var(--danger-tint);  color: oklch(38% 0.16 22);  }
+  .badge-none      { background: var(--surface-3);    color: var(--ink-muted);    }
+
+  .cat-chip {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: var(--accent-tint);
+    color: var(--accent-dim);
+  }
+
+  .offering-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  .offering-row:last-child { border-bottom: none; }
+}
+
+/* Calendar polish */
+.rbc-calendar {
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+.rbc-header {
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.rbc-event {
+  background: var(--accent) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+}
+.rbc-event:focus,
+.rbc-event:hover { background: var(--accent-dim) !important; }
+.rbc-today       { background: var(--accent-tint) !important; }
+.rbc-off-range-bg{ background: var(--surface-2) !important; }
+.rbc-toolbar button {
+  color: var(--ink);
+  border-color: var(--border-strong);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  transition: background 120ms;
+}
+.rbc-toolbar button:hover  { background: var(--surface-2); }
+.rbc-toolbar button.rbc-active {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+.rbc-month-view,
+.rbc-agenda-view table,
+.rbc-time-view          { border-color: var(--border) !important; }
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row,
+.rbc-header + .rbc-header { border-color: var(--border) !important; }
