@@ -185,14 +185,15 @@ export function Catalogue() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-12 text-center">
         <div role="alert" style={{
-          background: 'var(--danger-tint)',
-          border: '1px solid oklch(80% 0.08 22)',
-          borderRadius: '8px',
-          padding: '1.25rem',
-          color: 'oklch(35% 0.14 22)',
+          background: 'var(--danger-bg)',
+          border: '1px solid oklch(40% 0.15 22 / 0.5)',
+          borderRadius: '4px',
+          padding: '1rem',
+          color: 'var(--danger)',
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.875rem',
         }}>
-          <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Failed to load data</p>
-          <p style={{ fontSize: '0.875rem' }}>{error}</p>
+          <strong>Failed to load data</strong><br />{error}
         </div>
       </main>
     )

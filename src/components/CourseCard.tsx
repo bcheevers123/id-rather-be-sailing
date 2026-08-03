@@ -20,28 +20,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   other:            'Other',
 }
 
-function CalendarIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-      <rect x="1" y="3" width="14" height="12" rx="2"/>
-      <line x1="1" y1="7" x2="15" y2="7"/>
-      <line x1="5" y1="1" x2="5" y2="5"/>
-      <line x1="11" y1="1" x2="11" y2="5"/>
-    </svg>
-  )
-}
-
-function PriceIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-      <circle cx="8" cy="8" r="7"/>
-      <path d="M8 4v8M6 6h3a1.5 1.5 0 010 3H6"/>
-    </svg>
-  )
-}
-
 interface Props { course: Course }
 
 export function CourseCard({ course }: Props) {
@@ -53,55 +31,100 @@ export function CourseCard({ course }: Props) {
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
-        borderRadius: '8px',
-        display: 'block',
-        transition: 'border-color 120ms, box-shadow 120ms',
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        padding: '0.65rem 0.875rem',
+        textDecoration: 'none',
+        transition: 'border-color 100ms, background 100ms',
       }}
-      className="group p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] hover:border-[var(--accent)] hover:shadow-sm"
+      className="group focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--phosphor)] hover:border-[var(--accent)] hover:bg-[var(--surface-2)]"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="cat-chip">{catLabel}</span>
-            {course.abbreviation && (
-              <span style={{ color: 'var(--ink-muted)', fontSize: '0.8rem', fontFamily: 'ui-monospace, monospace' }}>
-                {course.abbreviation}
-              </span>
-            )}
-          </div>
-          <h3 style={{ color: 'var(--ink)', fontSize: '0.9375rem', fontWeight: 600, lineHeight: 1.3 }}
-            className="leading-snug group-hover:text-[var(--accent)] transition-colors">
-            {course.official_name}
-          </h3>
-          {course.description && (
-            <p style={{ color: 'var(--ink-muted)', fontSize: '0.8125rem', marginTop: '0.25rem' }}
-              className="line-clamp-2">
-              {course.description}
-            </p>
+      {/* AIS-style side marker */}
+      <div style={{
+        width: '3px',
+        alignSelf: 'stretch',
+        borderRadius: '2px',
+        background: 'var(--accent-tint)',
+        borderLeft: '2px solid var(--accent)',
+        flexShrink: 0,
+        transition: 'border-color 100ms',
+      }} className="group-hover:border-[var(--phosphor)]" aria-hidden="true" />
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+          <span className="cat-chip">{catLabel}</span>
+          {course.abbreviation && (
+            <span style={{
+              color: 'var(--ink-faint)',
+              fontSize: '0.72rem',
+              fontFamily: 'var(--font-data)',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+            }}>
+              {course.abbreviation}
+            </span>
           )}
+        </div>
+        <div style={{ color: 'var(--ink)', fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}
+          className="group-hover:text-[var(--accent)] transition-colors">
+          {course.official_name}
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1" style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)' }}>
-        <span>
-          <strong style={{ color: 'var(--ink)', fontWeight: 600 }}>{course.provider_count}</strong>
-          {' '}approved {course.provider_count === 1 ? 'centre' : 'centres'}
+      {/* Data column — right side */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        gap: '0.2rem',
+        flexShrink: 0,
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.72rem',
+          color: 'var(--ink-faint)',
+          letterSpacing: '0.01em',
+        }}>
+          {course.provider_count} {course.provider_count === 1 ? 'centre' : 'centres'}
         </span>
-        <span className="flex items-center gap-1">
-          <CalendarIcon />
-          {course.earliest_known_date
-            ? <span style={{ color: 'var(--ink)' }}>From {course.earliest_known_date}</span>
-            : <span style={{ color: 'var(--ink-faint)' }}>No dates listed</span>
-          }
-        </span>
-        <span className="flex items-center gap-1">
-          <PriceIcon />
-          {course.lowest_known_price_gbp !== null
-            ? <span style={{ color: 'var(--ink)' }}>From £{course.lowest_known_price_gbp.toFixed(0)}</span>
-            : <span style={{ color: 'var(--ink-faint)' }}>Price not published</span>
-          }
-        </span>
+        {course.earliest_known_date ? (
+          <span style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: '0.72rem',
+            color: 'var(--accent)',
+            fontWeight: 600,
+          }}>
+            {course.earliest_known_date}
+          </span>
+        ) : (
+          <span style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: '0.68rem',
+            color: 'var(--ink-faint)',
+          }}>
+            no dates
+          </span>
+        )}
+        {course.lowest_known_price_gbp !== null && (
+          <span style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: '0.72rem',
+            color: 'var(--ink-muted)',
+          }}>
+            £{course.lowest_known_price_gbp.toFixed(0)}+
+          </span>
+        )}
       </div>
+
+      {/* Chevron */}
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" aria-hidden="true"
+        style={{ color: 'var(--ink-faint)', flexShrink: 0 }}
+        className="group-hover:text-[var(--accent)] transition-colors">
+        <path d="M6 4l4 4-4 4"/>
+      </svg>
     </Link>
   )
 }

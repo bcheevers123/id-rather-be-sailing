@@ -8,16 +8,17 @@ export function DisambiguationBanner({ note }: Props) {
     <div
       role="note"
       style={{
-        background: 'var(--warn-tint)',
-        border: '1px solid oklch(82% 0.10 72)',
-        borderRadius: '8px',
-        padding: '0.75rem 1rem',
-        fontSize: '0.875rem',
-        color: 'oklch(36% 0.12 60)',
-        marginBottom: '1.25rem',
+        background: 'var(--warn-bg)',
+        border: '1px solid oklch(40% 0.12 80 / 0.5)',
+        borderRadius: '4px',
+        padding: '0.625rem 0.875rem',
+        fontSize: '0.8rem',
+        color: 'var(--warn)',
+        marginBottom: '1rem',
         display: 'flex',
         gap: '0.5rem',
         alignItems: 'flex-start',
+        fontFamily: 'var(--font-data)',
       }}
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"

@@ -5,30 +5,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Legacy navy kept for any remaining references
-        navy: {
-          50:  '#f0f4ff',
-          100: '#e0e9ff',
-          600: '#1e3a6e',
-          700: '#162d5a',
-          800: '#0f2044',
-          900: '#081530',
-        },
-        // CSS-variable tokens — use as text-ink, bg-surface-2, etc.
-        ink:      'var(--ink)',
-        'ink-muted':  'var(--ink-muted)',
-        'ink-faint':  'var(--ink-faint)',
-        surface:  'var(--surface)',
-        'surface-2': 'var(--surface-2)',
-        'surface-3': 'var(--surface-3)',
-        border:   'var(--border)',
-        accent:   'var(--accent)',
-        'accent-dim': 'var(--accent-dim)',
+        // Semantic CSS-variable tokens — use as text-ink, bg-surface, etc.
+        ink:           'var(--ink)',
+        'ink-muted':   'var(--ink-muted)',
+        'ink-faint':   'var(--ink-faint)',
+        surface:       'var(--surface)',
+        'surface-2':   'var(--surface-2)',
+        'surface-3':   'var(--surface-3)',
+        border:        'var(--border)',
+        'border-strong': 'var(--border-strong)',
+        accent:        'var(--accent)',
+        'accent-dim':  'var(--accent-dim)',
         'accent-tint': 'var(--accent-tint)',
+        phosphor:      'var(--phosphor)',
+        // Water ramp for direct use
+        water: {
+          900: 'var(--water-900)',
+          800: 'var(--water-800)',
+          700: 'var(--water-700)',
+          600: 'var(--water-600)',
+          500: 'var(--water-500)',
+          400: 'var(--water-400)',
+          300: 'var(--water-300)',
+          200: 'var(--water-200)',
+          100: 'var(--water-100)',
+          50:  'var(--water-50)',
+        },
       },
       borderColor: {
         DEFAULT: 'var(--border)',
         strong:  'var(--border-strong)',
+      },
+      fontFamily: {
+        data: 'var(--font-data)',
+        ui:   'var(--font-ui)',
       },
     },
   },

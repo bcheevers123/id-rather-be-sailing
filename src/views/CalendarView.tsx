@@ -43,25 +43,59 @@ export function CalendarView() {
   )
 
   const handleSelectEvent = useCallback((event: CalEvent) => {
-    const { offering } = event.resource
-    const url = safeHref(offering.booking_url)
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer')
-    }
+    const url = safeHref(event.resource.offering.booking_url)
+    if (url) window.open(url, '_blank', 'noopener,noreferrer')
   }, [])
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading calendar…</div>
-  if (error) return <div role="alert" className="p-8 text-center text-red-600">{error}</div>
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="skeleton" style={{ height: 36, width: 220, marginBottom: '0.5rem' }} />
+        <div className="skeleton" style={{ height: 20, width: 380, marginBottom: '1.5rem' }} />
+        <div className="skeleton" style={{ height: 520, borderRadius: '4px' }} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8" role="alert">
+        <div style={{
+          background: 'var(--danger-bg)',
+          border: '1px solid oklch(40% 0.15 22 / 0.5)',
+          borderRadius: '4px',
+          padding: '1rem',
+          color: 'var(--danger)',
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.875rem',
+        }}>
+          {error}
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Course Calendar</h1>
-      <p className="text-sm text-gray-500 mb-4">
-        Upcoming courses with known dates. Events without confirmed dates are not shown.
-        Click an event to go to the booking page.
-      </p>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div style={{ marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+          Course Calendar
+        </h1>
+        <p style={{ fontSize: '0.8rem', color: 'var(--ink-faint)', fontFamily: 'var(--font-data)' }}>
+          {events.length} upcoming {events.length === 1 ? 'session' : 'sessions'} with confirmed dates · click to book
+        </p>
+      </div>
 
-      <div aria-label="Course calendar" className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" style={{ height: 600 }}>
+      <div
+        aria-label="Course calendar"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '4px',
+          padding: '1rem',
+          height: 580,
+        }}
+      >
         <Calendar
           localizer={localizer}
           events={events}
@@ -77,11 +111,13 @@ export function CalendarView() {
           style={{ height: '100%' }}
           tooltipAccessor={(e: CalEvent) => {
             const { offering, course, provider } = e.resource
-            const price = offering.price ? ` | ${offering.currency} ${offering.price.toFixed(2)}` : ''
+            const price = offering.price
+              ? ` · £${offering.price.toFixed(0)}`
+              : ''
             return `${course.official_name}\n${provider.official_name}${price}`
           }}
         />
       </div>
-    </main>
+    </div>
   )
 }

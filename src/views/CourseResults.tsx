@@ -10,7 +10,7 @@ import { safeHref } from '../lib/safeHref'
 
 function BackArrow() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M10 3L5 8l5 5"/>
     </svg>
@@ -46,79 +46,87 @@ export function CourseResults() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <div style={{ height: '24px', width: '120px', borderRadius: '6px', background: 'var(--surface-3)', marginBottom: '1.5rem' }} />
-        <div style={{ height: '36px', width: '60%', borderRadius: '6px', background: 'var(--surface-3)', marginBottom: '0.5rem' }} />
-        <div style={{ height: '20px', width: '80%', borderRadius: '6px', background: 'var(--surface-3)' }} />
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
-      </main>
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {[120, 240, 180].map((w, i) => (
+            <div key={i} className="skeleton" style={{ height: i === 1 ? 36 : 20, width: w }} />
+          ))}
+        </div>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <div role="alert" style={{
-          background: 'var(--danger-tint)',
-          border: '1px solid oklch(80% 0.08 22)',
-          borderRadius: '8px',
-          padding: '1.25rem',
-          color: 'oklch(35% 0.14 22)',
+      <div className="mx-auto max-w-5xl px-4 py-8" role="alert">
+        <div style={{
+          background: 'var(--danger-bg)',
+          border: '1px solid oklch(40% 0.15 22 / 0.5)',
+          borderRadius: '4px',
+          padding: '1rem',
+          color: 'var(--danger)',
+          fontSize: '0.875rem',
+          fontFamily: 'var(--font-data)',
         }}>
           {error}
         </div>
-      </main>
+      </div>
     )
   }
 
   if (!course) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8 text-center">
-        <p style={{ color: 'var(--ink-muted)', marginBottom: '0.75rem' }}>Course not found.</p>
-        <Link to="/" className="flex items-center justify-center gap-1.5 text-sm">
+      <div className="mx-auto max-w-5xl px-4 py-8 text-center">
+        <p style={{ color: 'var(--ink-muted)', marginBottom: '0.75rem', fontSize: '0.875rem' }}>Course not found.</p>
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm">
           <BackArrow /> Back to catalogue
         </Link>
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       <Link
         to="/"
-        className="flex items-center gap-1.5 text-sm hover:underline mb-5"
-        style={{ color: 'var(--ink-muted)', width: 'fit-content' }}
+        className="inline-flex items-center gap-1.5 hover:underline mb-5"
+        style={{ color: 'var(--ink-faint)', fontSize: '0.78rem', fontFamily: 'var(--font-data)', letterSpacing: '0.01em', textDecoration: 'none' }}
       >
-        <BackArrow /> All courses
+        <BackArrow />
+        ALL COURSES
       </Link>
 
-      <header style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--ink)' }}>
+      <header style={{ marginBottom: '1.5rem', marginTop: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.375rem' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
             {course.official_name}
           </h1>
           {course.abbreviation && (
             <code style={{
-              background: 'var(--surface-3)',
-              color: 'var(--ink-muted)',
-              borderRadius: '5px',
-              padding: '0.15rem 0.5rem',
-              fontSize: '0.8125rem',
-              fontFamily: 'ui-monospace, monospace',
+              background: 'var(--accent-tint)',
+              color: 'var(--accent)',
+              border: '1px solid oklch(40% 0.14 155 / 0.4)',
+              borderRadius: '3px',
+              padding: '0.1rem 0.45rem',
+              fontSize: '0.75rem',
+              fontFamily: 'var(--font-data)',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
             }}>
               {course.abbreviation}
             </code>
           )}
         </div>
         {course.description && (
-          <p style={{ fontSize: '0.9375rem', color: 'var(--ink-muted)', maxWidth: '65ch', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', maxWidth: '65ch', lineHeight: 1.6 }}>
             {course.description}
           </p>
         )}
-        <p style={{ fontSize: '0.75rem', color: 'var(--ink-faint)', marginTop: '0.5rem' }}>
+        <p style={{ fontSize: '0.7rem', color: 'var(--ink-faint)', marginTop: '0.5rem', fontFamily: 'var(--font-data)' }}>
           MCA source:{' '}
-          <a href={safeHref(course.source_pdf_url) ?? '#'} target="_blank" rel="noopener noreferrer">
-            official provider list
+          <a href={safeHref(course.source_pdf_url) ?? '#'} target="_blank" rel="noopener noreferrer"
+            style={{ color: 'var(--ink-faint)' }} className="hover:text-[var(--ink-muted)] hover:underline">
+            gov.uk official list
           </a>
           {' '}· updated {course.source_updated_date}
         </p>
@@ -127,30 +135,31 @@ export function CourseResults() {
       <DisambiguationBanner note={course.confusion_note} />
 
       <div className="flex gap-6 flex-col md:flex-row">
-        <aside className="md:w-52 flex-shrink-0">
+        <aside className="md:w-48 flex-shrink-0">
           <FilterPanel filters={filters} onChange={setFilters} availableCountries={availableCountries} />
         </aside>
 
         <section aria-label="Approved training providers" className="flex-1 min-w-0">
-          <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', marginBottom: '1rem' }}>
-            <strong style={{ color: 'var(--ink)' }}>{sorted.length}</strong>
+          <p style={{ fontSize: '0.75rem', color: 'var(--ink-faint)', marginBottom: '0.875rem', fontFamily: 'var(--font-data)' }}>
+            <strong style={{ color: 'var(--ink-muted)' }}>{sorted.length}</strong>
             {' '}approved {sorted.length === 1 ? 'centre' : 'centres'}
             {Object.keys(filters).length > 0 ? ' (filtered)' : ''}
           </p>
           {sorted.length === 0 ? (
             <div style={{
-              background: 'var(--surface-2)',
+              background: 'var(--surface)',
               border: '1px solid var(--border)',
-              borderRadius: '8px',
+              borderRadius: '4px',
               padding: '2rem',
               textAlign: 'center',
-              color: 'var(--ink-muted)',
+              color: 'var(--ink-faint)',
               fontSize: '0.875rem',
+              fontFamily: 'var(--font-data)',
             }}>
               No providers match the current filters.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {sorted.map(result => (
                 <ProviderResultCard key={result.provider.id} result={result} />
               ))}
@@ -158,6 +167,6 @@ export function CourseResults() {
           )}
         </section>
       </div>
-    </main>
+    </div>
   )
 }
