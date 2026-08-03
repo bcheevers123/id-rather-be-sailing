@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from 'react'
 import React from 'react'
+import type { EventProps } from 'react-big-calendar'
 import { useSearchParams } from 'react-router-dom'
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay, addMonths } from 'date-fns'
@@ -21,8 +22,25 @@ const localizer = dateFnsLocalizer({
 function eventStyleGetter(event: CalEvent) {
   return {
     style: { '--rbc-event-bg': event.color } as React.CSSProperties,
-    className: `rbc-course-event`,
   }
+}
+
+// Custom agenda event: coloured pill matching the month-view style
+function AgendaEvent({ event }: EventProps<CalEvent>) {
+  return (
+    <span style={{
+      display: 'inline-block',
+      background: event.color,
+      color: '#fff',
+      borderRadius: 2,
+      padding: '1px 8px',
+      fontFamily: 'var(--font-data)',
+      fontSize: '0.75rem',
+      fontWeight: 600,
+    }}>
+      {event.title}
+    </span>
+  )
 }
 
 export function CalendarView() {
@@ -161,6 +179,7 @@ export function CalendarView() {
           allDayAccessor="allDay"
           style={{ height: 700 }}
           eventPropGetter={eventStyleGetter}
+          components={{ agenda: { event: AgendaEvent } }}
           tooltipAccessor={(e: CalEvent) => {
             const { offering, course, provider } = e.resource
             const price = offering.price
