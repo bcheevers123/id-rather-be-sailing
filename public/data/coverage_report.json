@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-08-03T11:15:29.835038+00:00",
+  "total_courses": 74,
+  "total_providers": 641,
+  "total_approvals": 633,
+  "providers_with_dates": 1,
+  "providers_with_prices": 1,
+  "providers_requiring_manual_review": 0,
+  "providers_blocking_automated_collection": 0,
+  "providers_no_public_schedule": 640,
+  "last_successful_full_refresh": "2026-08-03T11:15:29.835075+00:00",
+  "parse_failures": []
+}
