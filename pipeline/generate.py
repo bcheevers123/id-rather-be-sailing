@@ -53,6 +53,8 @@ STREAM_MARINE_ADAPTERS: dict[str, str] = {
     "efa": "https://streammarinetraining.com/arlo/events/8-stcw-elementary-first-aid-efa/",
     "pssr": "https://streammarinetraining.com/arlo/events/305-stcw-personal-safety-and-social-responsibility-stcw-security-awareness-pssrsa/",
     # PST is not offered separately by Stream Marine; it is bundled in the BSW (Basic Safety Training Week)
+    "bsw": "https://streammarinetraining.com/arlo/events/61-stcw-basic-safety-training-week-bsw/",
+    "stcw_refresher_5": "https://streammarinetraining.com/arlo/events/263-stcw-refresher-course-5-course-route-1-pstu-fpffu-pscrbu-affu-frbu/",
 }
 
 COURSE_NAME_TO_SLUG: dict[str, str] = {
