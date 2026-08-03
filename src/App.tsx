@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { Catalogue } from './views/Catalogue'
 import { CourseResults } from './views/CourseResults'
 import { CalendarView } from './views/CalendarView'
+import { PathwaysView } from './views/PathwaysView'
 
 function AnchorIcon() {
   return (
@@ -30,20 +31,22 @@ export default function App() {
             aria-label="I'd Rather Be Sailing — home"
           >
             <AnchorIcon />
-            <span style={{
+            <span className="hidden sm:inline" style={{
               fontFamily: 'var(--font-ui)',
               fontWeight: 700,
               fontSize: '1rem',
               letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap',
             }}>
               I'd Rather Be Sailing
             </span>
           </NavLink>
 
-          <nav className="flex items-center gap-1 ml-auto" aria-label="Main navigation">
+          <nav className="flex items-center gap-0.5 ml-auto shrink-0" aria-label="Main navigation">
             {[
               { to: '/', label: 'Courses', exact: true },
               { to: '/calendar', label: 'Calendar', exact: false },
+              { to: '/pathways', label: 'Pathways', exact: false },
             ].map(({ to, label, exact }) => (
               <NavLink
                 key={to}
@@ -51,7 +54,7 @@ export default function App() {
                 end={exact}
                 style={{ textDecoration: 'none' }}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded text-sm font-medium transition-colors duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ` +
+                  `px-2 sm:px-3 py-1.5 rounded text-xs sm:text-sm font-medium transition-colors duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 whitespace-nowrap ` +
                   (isActive
                     ? 'bg-white/20 text-white'
                     : 'text-white/65 hover:text-white hover:bg-white/10')
@@ -69,6 +72,7 @@ export default function App() {
           <Route path="/" element={<Catalogue />} />
           <Route path="/course/:id" element={<CourseResults />} />
           <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/pathways" element={<PathwaysView />} />
         </Routes>
       </main>
     </BrowserRouter>

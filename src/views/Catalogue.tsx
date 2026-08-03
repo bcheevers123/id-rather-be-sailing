@@ -199,10 +199,10 @@ export function Catalogue() {
         display: 'flex',
         alignItems: 'stretch',
         overflow: 'hidden',
-        minHeight: '130px',
+        minHeight: '110px',
       }}>
         {/* Title block */}
-        <div style={{ flex: 1, padding: '1rem 1.25rem 1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ flex: 1, padding: '0.875rem 1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
           <div style={{
             fontFamily: 'var(--font-data)',
             fontSize: '0.6rem',
@@ -210,39 +210,37 @@ export function Catalogue() {
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: 'var(--chart-red)',
-            marginBottom: '0.3rem',
+            marginBottom: '0.25rem',
           }}>
             MCA · Official Training Register
           </div>
-          <h1 style={{ fontSize: '1.4rem', marginBottom: '0.3rem', lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)', marginBottom: '0.25rem', lineHeight: 1.2 }}>
             UK Maritime Training
           </h1>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', maxWidth: '52ch', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', lineHeight: 1.6, margin: 0 }}>
             Every MCA-approved course with live dates and prices, refreshed daily.
           </p>
         </div>
 
-        {/* Sloop silhouette — chart illustration */}
-        <div style={{
-          display: 'flex',
+        {/* Sloop silhouette — hidden on narrow mobile */}
+        <div className="hidden sm:flex" style={{
           alignItems: 'flex-end',
-          paddingRight: '0.5rem',
-          paddingBottom: '0',
+          paddingRight: '0.25rem',
           opacity: 0.65,
           flexShrink: 0,
         }}>
-          <SloopSilhouette width={150} height={105} />
+          <SloopSilhouette width={130} height={91} />
         </div>
 
-        {/* Compass rose — bottom-right chart decoration */}
+        {/* Compass rose — always visible, smaller on mobile */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          paddingRight: '1rem',
-          opacity: 0.55,
+          paddingRight: '0.75rem',
+          opacity: 0.6,
           flexShrink: 0,
         }}>
-          <CompassRose size={80} />
+          <CompassRose size={70} />
         </div>
       </div>
 
