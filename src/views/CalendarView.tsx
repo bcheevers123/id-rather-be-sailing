@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback } from 'react'
+import React from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay, addMonths } from 'date-fns'
@@ -19,16 +20,8 @@ const localizer = dateFnsLocalizer({
 
 function eventStyleGetter(event: CalEvent) {
   return {
-    style: {
-      backgroundColor: event.color,
-      border: 'none',
-      borderRadius: '2px',
-      color: '#fff',
-      fontFamily: 'var(--font-data)',
-      fontSize: '0.7rem',
-      fontWeight: 600,
-      padding: '1px 5px',
-    },
+    // Set as CSS custom property so the !important rule in index.css picks it up
+    style: { '--rbc-event-bg': event.color } as React.CSSProperties,
   }
 }
 
