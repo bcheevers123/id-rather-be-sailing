@@ -3,6 +3,7 @@ import { Catalogue } from './views/Catalogue'
 import { CourseResults } from './views/CourseResults'
 import { CalendarView } from './views/CalendarView'
 import { PathwaysView } from './views/PathwaysView'
+import { ChartVesselsBackground } from './components/ChartVessels'
 
 function AnchorIcon() {
   return (
@@ -67,7 +68,8 @@ export default function App() {
         </div>
       </header>
 
-      <main id="main-content">
+      <ChartVesselsBackground />
+      <main id="main-content" style={{ position: 'relative', zIndex: 1 }}>
         <Routes>
           <Route path="/" element={<Catalogue />} />
           <Route path="/course/:id" element={<CourseResults />} />

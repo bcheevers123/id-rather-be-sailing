@@ -16,6 +16,8 @@ interface Pathway {
   id: string
   role: string
   description: string
+  source: string
+  sourceUrl: string
   courses: PathwayCourse[]
 }
 
@@ -24,6 +26,8 @@ const PATHWAYS: Pathway[] = [
     id: 'bosun',
     role: 'Bosun',
     description: 'Responsible for deck operations and crew safety on commercial vessels.',
+    source: 'MCA MIN 668 — Ratings forming part of a navigational watch',
+    sourceUrl: 'https://www.gov.uk/government/publications/min-668-stcw-ratings',
     courses: [
       { id: 'pst',   label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',  label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -36,6 +40,8 @@ const PATHWAYS: Pathway[] = [
     id: 'ab',
     role: 'Able Seafarer (Deck)',
     description: 'Watch-keeping rating on deck with full STCW Basic Safety certification.',
+    source: 'MCA MGN 671 — Able Seafarer Deck certification',
+    sourceUrl: 'https://www.gov.uk/government/publications/mgn-671-able-seafarer-deck',
     courses: [
       { id: 'pst',   label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',  label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -48,6 +54,8 @@ const PATHWAYS: Pathway[] = [
     id: 'officer_of_watch',
     role: 'Officer of the Watch (OOW)',
     description: 'Deck officer responsible for safe navigation during a watch.',
+    source: 'STCW Convention Table A-II/1 — OOW near-coastal & unlimited',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',        label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',       label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -64,6 +72,8 @@ const PATHWAYS: Pathway[] = [
     id: 'chief_officer',
     role: 'Chief Officer',
     description: 'First mate; responsible for cargo, stability, and crew management.',
+    source: 'STCW Convention Table A-II/2 — Chief Mate',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',        label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',       label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -81,6 +91,8 @@ const PATHWAYS: Pathway[] = [
     id: 'master',
     role: 'Master Mariner',
     description: 'Qualified to command any ship on any voyage worldwide.',
+    source: 'STCW Convention Table A-II/2 — Master on ships of 3,000 GT or more',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',        label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',       label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -100,6 +112,8 @@ const PATHWAYS: Pathway[] = [
     id: 'engineer_watchkeeper',
     role: 'Engineer Officer of the Watch',
     description: 'Engineering officer responsible for propulsion and machinery during a watch.',
+    source: 'STCW Convention Table A-III/1 — Engineer Officer of the Watch',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',        label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',       label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -114,6 +128,8 @@ const PATHWAYS: Pathway[] = [
     id: 'security_officer',
     role: 'Ship Security Officer (SSO)',
     description: 'Responsible for implementing and maintaining the ship\'s security plan.',
+    source: 'STCW Convention Section A-VI/5 — Ship Security Officer',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',   label: 'Personal Survival Techniques (PST)' },
       { id: 'fpff',  label: 'Fire Prevention & Fire Fighting (FPFF)' },
@@ -126,6 +142,8 @@ const PATHWAYS: Pathway[] = [
     id: 'gmdss',
     role: 'GMDSS Radio Operator',
     description: 'Certified to operate Global Maritime Distress and Safety System radio equipment.',
+    source: 'STCW Convention Table A-IV/2 — GMDSS Radio Operator',
+    sourceUrl: 'https://www.gov.uk/guidance/mca-approved-training-providers-atp',
     courses: [
       { id: 'pst',   label: 'Personal Survival Techniques (PST)' },
       { id: 'efa',   label: 'Elementary First Aid (EFA)' },
@@ -298,7 +316,18 @@ export function PathwaysView() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               <div>
                 <h2 style={{ fontSize: '1.1rem', marginBottom: '0.2rem' }}>{pathway.role}</h2>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', margin: 0 }}>{pathway.description}</p>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', margin: '0 0 0.3rem' }}>{pathway.description}</p>
+                <p style={{ fontSize: '0.68rem', color: 'var(--ink-faint)', margin: 0, fontFamily: 'var(--font-data)' }}>
+                  Pathway requirements source:{' '}
+                  <a
+                    href={pathway.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--soundings)' }}
+                  >
+                    {pathway.source}
+                  </a>
+                </p>
               </div>
               {/* Progress pill */}
               <div style={{
