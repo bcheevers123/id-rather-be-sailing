@@ -272,6 +272,11 @@
 .rbc-month-row + .rbc-month-row,
 .rbc-header + .rbc-header { border-color: var(--border) !important; }
 
+/* showAllEvents: rows must grow freely, no fixed height cap */
+.rbc-month-row { overflow: visible !important; height: auto !important; flex: none !important; }
+.rbc-row-content { overflow: visible !important; }
+.rbc-month-view { overflow-y: auto; }
+
 /* Loading skeleton */
 @keyframes chart-scan {
   0%   { opacity: 0.4; }

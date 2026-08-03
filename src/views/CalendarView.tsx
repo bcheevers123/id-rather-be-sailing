@@ -108,7 +108,7 @@ export function CalendarView() {
           views={[Views.MONTH, Views.AGENDA]}
           culture="en-GB"
           showAllEvents
-          style={{ height: view === Views.AGENDA ? 600 : 'auto', minHeight: 500 }}
+          style={{ height: view === Views.AGENDA ? 600 : undefined }}
           tooltipAccessor={(e: CalEvent) => {
             const { offering, course, provider } = e.resource
             const price = offering.price

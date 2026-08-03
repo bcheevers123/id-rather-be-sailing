@@ -4,6 +4,8 @@ import { useData } from '../hooks/useData'
 import { buildSearchIndex, searchCourses } from '../lib/search'
 import { SearchBar } from '../components/SearchBar'
 import { CourseCard } from '../components/CourseCard'
+import { CompassRose } from '../components/CompassRose'
+import { SloopSilhouette } from '../components/SloopSilhouette'
 import type { CourseCategory } from '../types/data'
 
 const CATEGORY_ORDER: CourseCategory[] = [
@@ -186,19 +188,62 @@ export function Catalogue() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      {/* Hero header — chart title block */}
+      {/* Hero — Admiralty chart cartouche */}
       <div style={{
         borderTop: '3px solid var(--chart-red)',
-        paddingTop: '0.875rem',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderTopColor: 'var(--chart-red)',
+        borderTopWidth: '3px',
         marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'stretch',
+        overflow: 'hidden',
+        minHeight: '130px',
       }}>
-        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>
-          MCA-Approved Maritime Training
-        </h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', maxWidth: '62ch', lineHeight: 1.6 }}>
-          Every course on the official MCA approved training providers list —
-          with live dates and prices from provider websites, refreshed daily.
-        </p>
+        {/* Title block */}
+        <div style={{ flex: 1, padding: '1rem 1.25rem 1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'var(--chart-red)',
+            marginBottom: '0.3rem',
+          }}>
+            MCA · Official Training Register
+          </div>
+          <h1 style={{ fontSize: '1.4rem', marginBottom: '0.3rem', lineHeight: 1.2 }}>
+            UK Maritime Training
+          </h1>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', maxWidth: '52ch', lineHeight: 1.6, margin: 0 }}>
+            Every MCA-approved course with live dates and prices, refreshed daily.
+          </p>
+        </div>
+
+        {/* Sloop silhouette — chart illustration */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          paddingRight: '0.5rem',
+          paddingBottom: '0',
+          opacity: 0.65,
+          flexShrink: 0,
+        }}>
+          <SloopSilhouette width={150} height={105} />
+        </div>
+
+        {/* Compass rose — bottom-right chart decoration */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingRight: '1rem',
+          opacity: 0.55,
+          flexShrink: 0,
+        }}>
+          <CompassRose size={80} />
+        </div>
       </div>
 
       <SearchBar value={query} onChange={setQuery} placeholder="Search by course name or abbreviation…" />
