@@ -14,6 +14,7 @@ from pathlib import Path
 import requests
 
 from pipeline.adapters.arlo import ArloAdapter
+from pipeline.adapters.blackpool import BlackpoolAdapter
 from pipeline.adapters.uksa import UKSAAdapter, COURSE_URLS as UKSA_COURSE_URLS
 from pipeline.adapters.stream_marine import StreamMarineAdapter
 from pipeline.adapters.you_and_sea import YouAndSeaAdapter
@@ -315,6 +316,17 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
             continue
         adapter = StreamMarineAdapter(course_id, source_url)
         raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Blackpool and The Fylde College adapter
+    blackpool_provider = providers_by_id.get("blackpool-and-the-fylde-college")
+    if not blackpool_provider:
+        logger.warning("Blackpool provider not found in providers_by_id")
+    else:
+        adapter = BlackpoolAdapter()
+        raw_offerings = adapter.fetch(blackpool_provider)
         for o in raw_offerings:
             o.freshness_status = compute_freshness(o.last_verified, now_iso)
             offerings.append(o.to_dict())
