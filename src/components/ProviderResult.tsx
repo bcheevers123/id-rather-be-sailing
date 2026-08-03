@@ -36,7 +36,8 @@ export function ProviderResultCard({ result }: Props) {
         )}
         {provider.telephone && <span className="text-gray-600">{provider.telephone}</span>}
         {provider.email && (
-          <a href={`mailto:${provider.email}`} className="text-navy-700 underline hover:text-navy-900">
+          <a href={`mailto:${provider.email}`} rel="noopener noreferrer"
+            className="text-navy-700 underline hover:text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-600">
             {provider.email}
           </a>
         )}
