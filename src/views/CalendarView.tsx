@@ -93,7 +93,6 @@ export function CalendarView() {
           border: '1px solid var(--border)',
           borderRadius: '4px',
           padding: '1rem',
-          height: 580,
         }}
       >
         <Calendar
@@ -108,7 +107,8 @@ export function CalendarView() {
           onSelectEvent={handleSelectEvent}
           views={[Views.MONTH, Views.AGENDA]}
           culture="en-GB"
-          style={{ height: '100%' }}
+          showAllEvents
+          style={{ height: view === Views.AGENDA ? 600 : 'auto', minHeight: 500 }}
           tooltipAccessor={(e: CalEvent) => {
             const { offering, course, provider } = e.resource
             const price = offering.price
