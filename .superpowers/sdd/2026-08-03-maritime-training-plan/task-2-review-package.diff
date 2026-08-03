@@ -1,0 +1,476 @@
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+new file mode 100644
+index 0000000..bb5f143
+--- /dev/null
++++ b/ARCHITECTURE.md
+@@ -0,0 +1,34 @@
++# Architecture
++
++## Overview
++
++Fully static architecture: a Python data pipeline runs daily in GitHub Actions, writes pre-generated JSON, and triggers a React frontend deployment to GitHub Pages.
++
++## Data flow
++
++1. GitHub Actions cron (`refresh.yml`) runs the Python pipeline
++2. Pipeline fetches the MCA guidance page and discovers current PDF URLs
++3. Pipeline downloads and parses each PDF — extracts provider-course approval records
++4. Pipeline visits each provider website via per-provider adapters — extracts dates, prices
++5. Pipeline validates all records against JSON Schema in `pipeline/schemas/`
++6. Pipeline writes `src/data/*.json`, commits, and pushes
++7. Push triggers `deploy.yml`, which builds the React SPA and publishes to GitHub Pages
++8. Users load the SPA; it fetches JSON over HTTP from GitHub Pages CDN
++
++## Why static
++
++- £0 hosting
++- No server to operate or patch
++- Safe failure mode: previous JSON retained when pipeline fails
++- All scraping is server-side (Actions), never in the user's browser
++
++## Key directories
++
++| Path | Purpose |
++|---|---|
++| `pipeline/` | Python data collection, parsing, validation |
++| `pipeline/adapters/` | Per-provider schedule scrapers |
++| `pipeline/schemas/` | JSON Schema for output validation |
++| `src/data/` | Static JSON consumed by the frontend |
++| `src/` | React + Vite + TypeScript frontend |
++| `.github/workflows/` | CI/CD and data refresh automation |
+diff --git a/DATA_MODEL.md b/DATA_MODEL.md
+new file mode 100644
+index 0000000..53f798d
+--- /dev/null
++++ b/DATA_MODEL.md
+@@ -0,0 +1,90 @@
++# Data Model
++
++All data lives in `src/data/` as static JSON. Schemas are in `pipeline/schemas/`.
++
++## courses.json
++
++| Field | Type | Notes |
++|---|---|---|
++| id | string | Stable slug, e.g. `pst` |
++| official_name | string | Exact MCA name |
++| abbreviation | string \| null | Verified abbreviation |
++| aliases | string[] | Controlled alias list |
++| category | string | See category list in spec |
++| description | string \| null | Brief plain-English summary |
++| confusion_note | string \| null | Shown when similar courses exist |
++| source_pdf_url | string | Current PDF URL |
++| source_updated_date | string | ISO date |
++| provider_count | number | Active approvals count |
++| earliest_known_date | string \| null | ISO date |
++| lowest_known_price_gbp | number \| null | GBP only |
++
++## providers.json
++
++| Field | Type |
++|---|---|
++| id | string |
++| official_name | string |
++| alt_names | string[] |
++| address | string |
++| city | string |
++| region | string |
++| country | string (ISO 3166-1 alpha-2) |
++| postcode | string \| null |
++| lat / lng | number \| null |
++| website | string \| null |
++| email | string \| null |
++| telephone | string \| null |
++| not_open_to_public | boolean |
++
++## approvals.json
++
++| Field | Type |
++|---|---|
++| course_id | string |
++| provider_id | string |
++| source_pdf_url | string |
++| source_updated_date | string |
++| status | "active" \| "removed" |
++| first_seen | string (ISO date) |
++| last_seen | string (ISO date) |
++| not_open_to_public | boolean |
++
++## offerings.json
++
++| Field | Type |
++|---|---|
++| id | string |
++| course_id | string |
++| provider_id | string |
++| start_date | string (ISO date) |
++| end_date | string (ISO date) |
++| timezone | string (IANA) |
++| duration_days | number \| null |
++| price | number \| null |
++| currency | string (ISO 4217) \| null |
++| vat_included | boolean \| null |
++| delivery_format | "in_person" \| "blended" \| "online" \| "unknown" |
++| availability | string \| null |
++| booking_url | string \| null |
++| source_url | string |
++| last_verified | string (ISO datetime) |
++| freshness_status | "verified" \| "recently_checked" \| "stale" \| "source_unavailable" \| "no_public_schedule" |
++
++## retrieval_log.json — array of entries
++
++| Field | Type |
++|---|---|
++| source_url | string |
++| retrieved_at | string (ISO datetime) |
++| http_status | number \| null |
++| content_hash | string \| null |
++| parser_id | string |
++| parse_result | "ok" \| "failed" \| "no_data" |
++| error_detail | string \| null |
++| offerings_found | number |
++| previous_good_result_at | string \| null |
++
++## coverage_report.json
++
++See `pipeline/schemas/coverage_report.schema.json` for full schema.
+diff --git a/DATA_SOURCES.md b/DATA_SOURCES.md
+new file mode 100644
+index 0000000..65bb25b
+--- /dev/null
++++ b/DATA_SOURCES.md
+@@ -0,0 +1,25 @@
++# Data Sources
++
++## Layer A — Official MCA approval data
++
++| Property | Value |
++|---|---|
++| Source | https://www.gov.uk/guidance/mca-approved-training-providers-atp |
++| Format | Individual PDFs (one per course), text-based, parseable |
++| Update cycle | Monthly |
++| Last confirmed | 2026-07-16 |
++| Parser | `pipeline/pdf_parser.py` using `pdfplumber` |
++
++Each PDF contains: provider name, location (UK county or country), full address, telephone, email, website.
++
++PDF URLs change monthly (date-stamped filenames). The pipeline always re-discovers them from the main page rather than hardcoding URLs.
++
++## Layer B — Provider schedule data
++
++Each provider's own website. See `PROVIDER_COVERAGE.md` for current adapter status per provider.
++
++## Data not collected
++
++- User data of any kind
++- Private or login-required provider pages
++- Third-party aggregator sites (unless clearly identified as the actual approved provider)
+diff --git a/DEPLOYMENT.md b/DEPLOYMENT.md
+new file mode 100644
+index 0000000..2985d30
+--- /dev/null
++++ b/DEPLOYMENT.md
+@@ -0,0 +1,32 @@
++# Deployment
++
++## First-time setup
++
++1. Fork or clone this repository.
++2. In GitHub repository Settings → Pages: set Source to "GitHub Actions".
++3. In Settings → Actions → General: allow Actions to create and approve pull requests (needed for the pipeline to commit JSON updates).
++4. Add the following repository secret: `PIPELINE_TOKEN` — a GitHub Personal Access Token with `repo` scope (needed for the pipeline workflow to push commits).
++
++## Automatic deployment
++
++Every push to `main` triggers `.github/workflows/deploy.yml`, which:
++1. Runs `npm run build`
++2. Publishes the `dist/` directory to GitHub Pages
++
++The site is available at: `https://bcheevers123.github.io/id-rather-be-sailing/`
++
++## Data refresh
++
++`.github/workflows/refresh.yml` runs daily at 06:00 UTC:
++1. Runs the Python pipeline (`python -m pipeline.generate`)
++2. Commits any changes to `src/data/`
++3. Pushes, which triggers the deploy workflow
++
++Trigger manually: Actions tab → `refresh` workflow → "Run workflow".
++
++## Local preview
++
++```bash
++npm run build
++npm run preview
++```
+diff --git a/OPERATIONS.md b/OPERATIONS.md
+new file mode 100644
+index 0000000..e70499b
+--- /dev/null
++++ b/OPERATIONS.md
+@@ -0,0 +1,30 @@
++# Operations
++
++## Daily pipeline
++
++Runs at 06:00 UTC via GitHub Actions. Completes in under 10 minutes for a full refresh.
++
++## Monitoring
++
++- Check the Actions tab for failed runs.
++- `src/data/coverage_report.json` contains per-provider failure details.
++- GitHub Actions sends email notifications to the repo owner on workflow failure (configure in Settings → Notifications).
++
++## Freshness thresholds
++
++| Data | Verified | Recently checked | Stale |
++|---|---|---|---|
++| Provider schedules | < 24 hours | 1–7 days | > 7 days |
++| MCA approval PDFs | < 32 days | — | > 32 days |
++
++## Common issues
++
++**Pipeline fails with HTTP 403 on MCA PDF:** The PDF URL has changed (monthly update). Check that `pipeline/mca_source.py` is correctly discovering URLs from the guidance page rather than using hardcoded paths.
++
++**Provider returns 0 offerings (was non-zero before):** Change detector flags this. Check `coverage_report.json`. The provider may have changed their site structure — update the adapter.
++
++**GitHub Pages deploy fails:** Check that the `GITHUB_TOKEN` permissions in `deploy.yml` include `pages: write` and `id-token: write`.
++
++## Adding a new provider adapter
++
++See `README.md` → "Adding a provider adapter".
+diff --git a/PRODUCT_REQUIREMENTS.md b/PRODUCT_REQUIREMENTS.md
+new file mode 100644
+index 0000000..cdc46b4
+--- /dev/null
++++ b/PRODUCT_REQUIREMENTS.md
+@@ -0,0 +1,31 @@
++# Product Requirements
++
++See the full design specification at `docs/superpowers/specs/2026-08-03-maritime-training-design.md`.
++
++## Summary
++
++A public web application for maritime professionals to find MCA-approved training courses and providers.
++
++## Must-haves (MVP)
++
++- Browse all ~75 MCA-approved courses
++- Search by name, abbreviation, or alias
++- Course results page: all approved providers for a course
++- Providers shown even when no schedule data is available
++- Rolling calendar of known upcoming dates
++- Filters: category, country, has dates, has price, delivery format
++- Sort: earliest date, lowest price, provider name, recently verified
++- Data freshness indicators on all provider results
++- Source attribution (MCA PDF URL + last checked date) on all data
++- WCAG 2.2 AA accessibility
++- Mobile-first responsive design
++- No user accounts, no cookies, no personal data
++
++## Explicit non-goals (MVP)
++
++- User accounts, saved searches, alerts, email notifications
++- Distance-based filtering
++- Currency conversion
++- Booking within the app
++- Mobile native app
++- Paid infrastructure
+diff --git a/PROVIDER_COVERAGE.md b/PROVIDER_COVERAGE.md
+new file mode 100644
+index 0000000..daa12d2
+--- /dev/null
++++ b/PROVIDER_COVERAGE.md
+@@ -0,0 +1,22 @@
++# Provider Coverage
++
++This file is updated automatically by the pipeline on each run.
++
++Last updated: (updated by pipeline)
++
++## Coverage summary
++
++See `src/data/coverage_report.json` for machine-readable current state.
++
++## Adapter status
++
++| Provider | Adapter | Status | Notes |
++|---|---|---|---|
++| Maritime Skills Academy (Dover) | `arlo` | Active | Arlo platform |
++| UKSA | `uksa` | Active | Custom HTML |
++| Stream Marine Training | `stream_marine` | Active | Custom HTML |
++| All others | — | No public schedule | Contact provider directly |
++
++## Providers blocking automated collection
++
++None currently identified. If a provider's `robots.txt` disallows crawling or they have explicitly requested no automated access, they will be listed here.
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..2648391
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,76 @@
++# I'd Rather Be Sailing
++
++Find MCA-approved maritime training courses, approved training centres, upcoming dates and prices.
++
++## What this application does
++
++Helps seafarers find courses approved by the Maritime and Coastguard Agency (MCA), the approved training centres offering them, and upcoming dates and prices where that information is publicly available.
++
++## What it does not guarantee
++
++- Schedule data is only as fresh as the last successful pipeline run (daily).
++- Many providers do not publish schedules online — those providers still appear with contact details.
++- No dates, prices or availability are fabricated or estimated.
++
++## Approval data vs schedule data
++
++**Approval data** (Layer A) comes from official MCA PDF documents on GOV.UK. It tells you which provider is approved to run which course. It is authoritative.
++
++**Schedule data** (Layer B) comes from each provider's own website. It tells you when they are actually running the course and at what price. It varies in availability and freshness.
++
++## Running locally
++
++```bash
++# Python pipeline
++python -m venv .venv
++source .venv/bin/activate  # Windows: .venv\Scripts\activate
++pip install -r requirements.txt
++python -m pipeline.generate --dry-run
++
++# Frontend
++npm install
++npm run dev
++```
++
++## Refreshing data
++
++```bash
++python -m pipeline.generate
++# Writes updated JSON to src/data/ and reports to pipeline/output/
++```
++
++Or trigger the `refresh` GitHub Actions workflow manually from the Actions tab.
++
++## Adding a provider adapter
++
++1. Create `pipeline/adapters/<provider_slug>.py`
++2. Subclass `BaseAdapter` from `pipeline/adapters/base.py`
++3. Implement `fetch(provider: Provider) -> list[Offering]`
++4. Register the adapter in `pipeline/adapters/__init__.py`
++5. Add fixture HTML/JSON to `tests/pipeline/fixtures/`
++6. Write tests in `tests/pipeline/test_adapters_<provider_slug>.py`
++
++See `SCRAPING_POLICY.md` before scraping any new site.
++
++## Running tests
++
++```bash
++pytest                        # all pipeline tests
++pytest --cov=pipeline         # with coverage
++npm test                      # frontend tests
++```
++
++## Deploying
++
++Push to `main`. GitHub Actions builds the React app and deploys to GitHub Pages automatically.
++
++See `DEPLOYMENT.md` for first-time setup.
++
++## Diagnosing a failed refresh
++
++1. Open the **Actions** tab in GitHub → find the failed `refresh` workflow run
++2. Read the step logs — the pipeline logs which source failed and why
++3. Check `pipeline/output/coverage_report.json` for per-provider failure details
++4. If the MCA page structure changed, update `pipeline/mca_source.py`
++5. If a provider's site changed, update or replace its adapter
++6. If JSON Schema validation failed, check `pipeline/output/validation_errors.log`
+diff --git a/SCRAPING_POLICY.md b/SCRAPING_POLICY.md
+new file mode 100644
+index 0000000..19309c5
+--- /dev/null
++++ b/SCRAPING_POLICY.md
+@@ -0,0 +1,25 @@
++# Scraping Policy
++
++## Before scraping any site
++
++1. Check for a public API or structured data feed first.
++2. Fetch and read `robots.txt`. If the relevant path is disallowed, do not scrape — mark the provider `no_public_schedule`.
++3. Review the site's terms of use for restrictions on automated access.
++
++## During collection
++
++- User-Agent: `Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)`
++- Minimum 2-second delay between requests to the same domain.
++- Use `If-None-Match` / `If-Modified-Since` conditional requests where supported.
++- Cache responses; do not re-download unchanged content.
++- Do not bypass CAPTCHAs, authentication, or anti-bot measures.
++- Do not scrape login-required or private pages.
++- Do not disguise automated activity.
++
++## When collection is not possible
++
++Keep the provider in the approved-centre results. Set `freshness_status: no_public_schedule`. Link to their website. Record the reason in `PROVIDER_COVERAGE.md`.
++
++## Rate limits
++
++No more than 1 request per 2 seconds per domain. The pipeline processes providers sequentially within each domain.
+diff --git a/TESTING.md b/TESTING.md
+new file mode 100644
+index 0000000..8d82046
+--- /dev/null
++++ b/TESTING.md
+@@ -0,0 +1,51 @@
++# Testing
++
++## Running tests
++
++```bash
++# All pipeline tests
++pytest
++
++# With coverage
++pytest --cov=pipeline --cov-report=term-missing
++
++# Frontend tests
++npm test
++
++# Specific test file
++pytest tests/pipeline/test_pdf_parser.py -v
++```
++
++## Test categories
++
++### Pipeline unit tests (use fixtures — no live HTTP)
++
++| File | Tests |
++|---|---|
++| `test_mca_source.py` | PDF URL discovery from saved HTML fixture |
++| `test_pdf_parser.py` | Provider extraction from PDF fixtures (PST, FPFF, FRB) |
++| `test_normalise.py` | Slug generation, name dedup, "not open to public" handling |
++| `test_validate.py` | Schema validation pass/fail cases for all entity types |
++| `test_freshness.py` | Freshness status logic for all thresholds |
++| `test_change_detector.py` | Provider added, removed, price jump, zero-offerings anomaly |
++| `test_adapters_arlo.py` | Arlo adapter against saved HTML fixture |
++| `test_adapters_generic_html.py` | Fallback scraper against fixture |
++| `test_generate.py` | Full pipeline orchestration with mocked HTTP |
++
++### Frontend unit tests (Vitest)
++
++| File | Tests |
++|---|---|
++| `search.test.ts` | Alias expansion, fuzzy matching, confusion note surfacing |
++| `filters.test.ts` | All filter combinations, sort orders |
++| `Calendar.test.tsx` | Event rendering, multi-day spans, empty state |
++
++## Fixture policy
++
++- Parser tests use saved files in `tests/pipeline/fixtures/`
++- HTTP responses are mocked with `responses` library (never live)
++- A small separate smoke test suite (`tests/smoke/`) may hit live URLs but is NOT run in CI
++
++## Coverage target
++
++Pipeline: ≥ 85% line coverage on `pipeline/` excluding `pipeline/adapters/` stubs.

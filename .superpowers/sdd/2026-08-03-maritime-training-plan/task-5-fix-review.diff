@@ -1,0 +1,32 @@
+diff --git a/pipeline/pdf_parser.py b/pipeline/pdf_parser.py
+index 53b3ea7..f3107d3 100644
+--- a/pipeline/pdf_parser.py
++++ b/pipeline/pdf_parser.py
+@@ -4,14 +4,12 @@ from dataclasses import dataclass, field
+ from pathlib import Path
+ 
+ import pdfplumber
+ 
+-from pipeline.normalise import make_slug, extract_contact_parts
+-
+ logger = logging.getLogger(__name__)
+ 
+ _NOT_PUBLIC_RE = re.compile(r"not open to public", re.I)
+-_OUTSIDE_UK_HEADING_RE = re.compile(r"outside.*uk|non.uk", re.I)
++_OUTSIDE_UK_HEADING_RE = re.compile(r"outside.*uk|non[- ]?uk", re.I)
+ 
+ 
+ @dataclass
+ class RawProvider:
+@@ -40,9 +38,10 @@ class ParsedPdf:
+ 
+ def _clean(text: str | None) -> str:
+     if not text:
+         return ""
+-    return " ".join(text.split())
++    # Collapse horizontal whitespace only; preserve newlines for contact parsing
++    return re.sub(r"[^\S\n]+", " ", text).strip()
+ 
+ 
+ def parse_pdf(pdf_path: Path, course_id: str, pdf_url: str, source_updated_date: str) -> ParsedPdf:
+     result = ParsedPdf()

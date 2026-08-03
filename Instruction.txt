@@ -1,0 +1,703 @@
+You are a senior full-stack engineer, data engineer, web-scraping specialist, product designer and technical architect.
+
+Your task is to research, design and implement a production-quality web application that helps professional seafarers find MCA-approved maritime training courses, the approved centres offering them, and upcoming course dates and prices where that information is publicly available.
+
+## 1. Project context
+
+This application is being created for my brother and his colleagues. My brother is a deputy captain on a superyacht and regularly needs to find maritime training courses required for his role and career progression.
+
+I am developing the application, but I know very little about sailing, maritime qualifications, MCA terminology or the relationships between the different courses and certificates.
+
+Therefore:
+
+* Do not assume I understand maritime terminology.
+* Explain important maritime concepts in plain English.
+* Define acronyms when first used.
+* Do not rely on me to identify whether two similarly named courses are equivalent.
+* Validate course names and classifications against authoritative sources.
+* Ask targeted questions only when the answer materially affects the product or architecture.
+* Do not ask me to repeat requirements already provided below.
+
+Use UK English throughout.
+
+## 2. Primary authoritative source
+
+The initial authoritative source for MCA-approved courses and training providers is:
+
+https://www.gov.uk/guidance/mca-approved-training-providers-atp
+
+Inspect the complete page and every relevant linked document.
+
+Do not assume that web scraping is automatically the correct solution. First investigate whether GOV.UK, the Maritime and Coastguard Agency, individual providers or another authoritative source exposes:
+
+* Structured HTML
+* JSON data
+* APIs
+* CSV or spreadsheet downloads
+* Document metadata
+* Stable PDF URLs
+* RSS or update feeds
+* Sitemap data
+* Other machine-readable sources
+
+Prefer stable, structured and authorised data sources over brittle HTML scraping.
+
+The MCA source should determine:
+
+* Which courses exist
+* The official course name
+* The course category
+* Which providers are approved for each course
+* The provider’s location and contact details
+* The source document establishing the approval
+* When the official source was last updated
+
+The official MCA list establishes approval status. It does not necessarily prove that a provider is currently scheduling the course.
+
+## 3. Core user need
+
+A user must be able to:
+
+1. Browse all available MCA-listed courses.
+2. Search for a course by its full name, partial name, abbreviation or common alternative name.
+3. Select a course.
+4. See every approved training centre associated with that course.
+5. See upcoming dates offered by each centre where reliable dates can be found.
+6. See prices where reliable public pricing can be found.
+7. Open the relevant provider booking or course page.
+8. Filter and sort the results.
+9. View upcoming courses in a rolling calendar.
+
+The app must not require users to create an account.
+
+There are no saved searches, favourites, alerts, email notifications or personalised user data in the MVP.
+
+## 4. Required application views
+
+### Course catalogue
+
+Create a browseable catalogue containing every course found through the approved MCA source.
+
+Users should be able to browse by logical category, such as:
+
+* STCW basic training
+* STCW advanced training
+* Refresher or updating training
+* Tanker training
+* Security training
+* Deck yacht modules
+* Engineering modules
+* Radio and communications training
+* Other MCA-approved training
+
+Use the official classifications where possible. Do not invent categories that could mislead users.
+
+Each course entry should include:
+
+* Official course name
+* Common abbreviation, where verified
+* Brief plain-English explanation
+* Category
+* Number of approved centres
+* Earliest known upcoming date
+* Lowest known public price
+* Data freshness indicator
+
+Do not generate course descriptions from guesswork. Clearly distinguish authoritative descriptions from concise interface summaries.
+
+### Course results page
+
+After choosing a course, show the approved providers associated with it.
+
+Each provider result should display, where available:
+
+* Provider name
+* Town or city
+* Region
+* Country
+* Full address
+* Distance from a chosen location, if implemented reliably
+* Upcoming course dates
+* Course duration
+* Price
+* Currency
+* Tax or VAT information when explicitly stated
+* Delivery format, such as in-person, blended or online
+* Availability or booking status, if explicitly published
+* Direct course or booking link
+* Provider website
+* Telephone number
+* Email address
+* MCA approval source
+* Date the approval source was last updated
+* Date the provider information was last checked
+* Data freshness or stale-data warning
+
+A provider must remain visible even when no dates or prices can be found. In that situation, show clear text such as:
+
+* “No public dates found”
+* “Price not published”
+* “Contact provider”
+* “Schedule information could not be verified”
+
+Never invent, estimate or infer a date, price, duration or availability status.
+
+### Rolling calendar
+
+Provide a calendar view showing known upcoming course instances.
+
+The calendar should:
+
+* Default to a useful rolling period, such as the next three or six months.
+* Support moving forwards and backwards through time.
+* Allow filtering by course, provider and location.
+* Clearly display multi-day courses.
+* Handle different countries, currencies and time zones.
+* Link each event to its provider and booking source.
+* Exclude undated offerings rather than assigning artificial dates.
+* Work well on desktop and mobile.
+
+Consider offering both:
+
+* A conventional month calendar.
+* A chronological agenda or timeline view.
+
+The agenda view may be more practical on mobile.
+
+## 5. Filters and sorting
+
+At minimum, support filtering by:
+
+* Course
+* Course category
+* Country
+* Region
+* Town or city
+* Date range
+* Provider
+* Maximum price
+* Currency
+* Delivery format, where known
+* Whether an upcoming date is available
+* Whether a public price is available
+
+Support sorting by:
+
+* Earliest upcoming date
+* Lowest price
+* Location
+* Provider name
+* Most recently verified
+
+Investigate whether distance-based filtering can be implemented accurately without introducing paid services or unnecessary infrastructure.
+
+Do not combine prices from different currencies into a misleading comparison. Currency conversion should only be added if a reliable approach and clear conversion timestamp are provided.
+
+## 6. Search behaviour
+
+The search should tolerate:
+
+* Partial course names
+* Common abbreviations
+* Punctuation differences
+* Minor spelling errors
+* Alternate spacing
+* Terms such as “refresher”, “updated” or “updating”
+* Similar courses that must remain distinct
+
+Create a controlled alias system rather than relying entirely on fuzzy search.
+
+For example, the application must not accidentally merge:
+
+* An initial course with its refresher course
+* Operational and management-level versions
+* Yacht-restricted and unrestricted versions
+* Basic and advanced qualifications
+
+Where two courses are easily confused, show a brief clarification.
+
+## 7. Data acquisition and refresh strategy
+
+There are two distinct data layers.
+
+### Layer A: official approval data
+
+Source this from the MCA/GOV.UK material.
+
+This layer establishes:
+
+* Course identity
+* Official course category
+* Approved provider
+* Provider contact information
+* Approval source
+* Official-source update date
+
+### Layer B: provider offering data
+
+Source this from the approved provider’s own website where permitted.
+
+This layer may establish:
+
+* Upcoming dates
+* Price
+* Currency
+* Course duration
+* Delivery format
+* Availability
+* Booking URL
+
+Never treat a third-party intermediary as the actual approved training provider unless the relationship is clearly identified.
+
+For every field, retain provenance so that the application can identify:
+
+* The source URL
+* The time it was retrieved
+* The parser or adapter used
+* Whether it came from an official MCA source or provider source
+* Whether the data was directly stated or normalised
+* Whether the source is now stale or unavailable
+
+## 8. Scraping and responsible data collection
+
+Before implementing a scraper for any site:
+
+* Check for structured data or an API.
+* Review robots.txt where applicable.
+* Review relevant terms and usage restrictions.
+* Use a descriptive user agent.
+* Apply conservative rate limiting.
+* Cache responses.
+* Avoid repeatedly downloading unchanged files.
+* Use conditional requests where supported.
+* Do not bypass authentication, CAPTCHAs, anti-bot measures or access controls.
+* Do not scrape private, logged-in or non-public information.
+* Do not attempt to disguise automated activity.
+
+If a provider does not permit reliable automated collection:
+
+* Keep the provider in the approved-centre results.
+* Link to its website.
+* Mark dates and prices as unavailable.
+* Record the reason in the internal coverage report.
+
+Use provider-specific adapters where necessary rather than creating one fragile universal parser.
+
+If multiple providers use a common booking platform, investigate whether a reusable adapter is possible.
+
+## 9. Data quality and freshness
+
+The app must communicate data quality honestly.
+
+For each course offering, support statuses such as:
+
+* Verified
+* Recently checked
+* Stale
+* Source unavailable
+* Parsing failed
+* No public schedule
+* No public price
+
+Choose sensible freshness thresholds based on the type of data.
+
+For example:
+
+* Approval data may follow the official MCA update cycle.
+* Course dates and prices may need more frequent checks.
+* Past course dates must be removed or archived automatically.
+* A failed refresh should not silently replace valid data with empty data.
+
+Retain the last known valid result when a temporary source failure occurs, but visibly mark it as stale.
+
+Implement change detection so that significant changes can be reviewed, including:
+
+* A provider being added or removed
+* A course list changing
+* A provider URL changing
+* A parser suddenly returning no courses
+* A major price change
+* Previously available dates disappearing
+* A source document changing structure
+
+Generate machine-readable refresh logs and a human-readable coverage report.
+
+## 10. Stateless versus stateful architecture
+
+The user-facing MVP does not require accounts or stored user preferences.
+
+Evaluate at least these approaches:
+
+### Option A: fully static generated application
+
+A scheduled data pipeline collects and normalises data, generates static JSON, and publishes the frontend and data to GitHub Pages.
+
+### Option B: static frontend with serverless data jobs or endpoints
+
+The frontend remains static, while scheduled collection or data access uses a low-cost serverless platform.
+
+### Option C: application with a database and backend
+
+A backend stores provider, course, offering and refresh history data.
+
+For each option, compare:
+
+* Hosting cost
+* Maintenance burden
+* Reliability
+* Data freshness
+* Scraping compatibility
+* GitHub Pages compatibility
+* Scheduled-job support
+* Observability
+* Scalability
+* Failure recovery
+* Security
+* Risk of vendor lock-in
+
+Prefer the simplest architecture that can reliably satisfy the requirements.
+
+A particularly important possibility to investigate is a stateless user-facing application backed by pre-generated JSON that is refreshed through scheduled repository automation. This could preserve GitHub Pages hosting without performing scraping in the browser.
+
+However, do not select this architecture without validating that it can support:
+
+* Scheduled refreshes
+* PDF parsing
+* Provider-site collection
+* Data generation
+* Failure reporting
+* Safe publication
+* Reasonable execution limits
+
+Verify current platform pricing and limitations rather than relying on outdated assumptions.
+
+## 11. Suggested domain model
+
+Design a normalised model containing concepts equivalent to:
+
+### Course
+
+* Stable internal ID
+* Official name
+* Abbreviation
+* Verified aliases
+* Category
+* Description
+* Official source URL
+* Official source updated date
+
+### Provider
+
+* Stable internal ID
+* Official name
+* Alternative names
+* Address
+* Town or city
+* Region
+* Country
+* Coordinates, if reliably obtained
+* Website
+* Email
+* Telephone
+
+### Approval
+
+* Course ID
+* Provider ID
+* Approval source URL
+* Official source updated date
+* Active or removed status
+* First seen
+* Last seen
+
+### Offering
+
+* Course ID
+* Provider ID
+* Start date
+* End date
+* Time zone
+* Duration
+* Price
+* Currency
+* Delivery format
+* Availability
+* Booking URL
+* Source URL
+* Last successfully verified
+* Freshness status
+
+### Retrieval record
+
+* Source URL
+* Retrieval time
+* HTTP result
+* Content hash
+* Parser version
+* Parsing result
+* Error details
+* Last known successful result
+
+Refine this model based on what the real sources contain.
+
+Use schema validation to prevent malformed scraped data from reaching the frontend.
+
+## 12. User experience and visual design
+
+The interface should feel professional, trustworthy and efficient.
+
+The intended users are working maritime professionals who may be:
+
+* Searching quickly between contracts
+* Travelling internationally
+* Using a mobile phone
+* Comparing dates across several countries
+* Unfamiliar with which centre offers the next suitable course
+
+Design principles:
+
+* Mobile-first
+* Fast loading
+* Clear search and filters
+* Minimal unnecessary navigation
+* Accessible
+* No account wall
+* No decorative nautical clichés
+* Clear source attribution
+* Clear “last checked” information
+* Easy access to the provider’s booking page
+
+Aim for WCAG 2.2 AA accessibility.
+
+Use semantic HTML, keyboard-accessible controls, visible focus states and appropriate screen-reader labels.
+
+Filter state may be represented in the URL so searches can be shared or bookmarked without creating user accounts or persistent profiles.
+
+## 13. Coverage expectations
+
+The product must browse every course found in the official MCA source.
+
+However, do not falsely claim complete coverage of dates and prices until it has been demonstrated.
+
+Maintain a coverage report containing:
+
+* Total official courses
+* Total approved providers
+* Total course-provider approval relationships
+* Providers with working schedule extraction
+* Providers with working price extraction
+* Providers requiring manual review
+* Providers that prohibit or block automated collection
+* Providers without public schedules
+* Last successful full refresh
+* Current parser failures
+
+The interface should explain that approval coverage and live schedule coverage are different.
+
+## 14. Testing requirements
+
+Use test-driven development where practical.
+
+Create tests for:
+
+* Discovering all relevant official course documents
+* Parsing official provider lists
+* Normalising provider names
+* Separating similarly named courses
+* Detecting removed and added providers
+* Provider-specific schedule parsers
+* Date parsing
+* Multi-day courses
+* International date formats
+* Time zones
+* Currency parsing
+* Prices including and excluding VAT
+* Missing prices
+* Missing dates
+* Duplicate offerings
+* Past-date removal
+* Stale-data handling
+* Parser failures
+* Schema validation
+* Search aliases
+* Filters
+* Sorting
+* Calendar rendering
+* Mobile layouts
+* Accessibility
+* Broken source links
+
+Store representative source fixtures for parser tests, subject to any applicable usage restrictions.
+
+Do not make automated tests depend entirely on live external websites. Separate parser fixture tests from limited integration checks.
+
+## 15. Security and privacy
+
+The MVP should collect no personal user data.
+
+Avoid cookies unless genuinely necessary.
+
+Do not introduce authentication.
+
+Validate all generated data before rendering it.
+
+Treat scraped content as untrusted input.
+
+Prevent:
+
+* Script injection
+* Unsafe HTML rendering
+* Malicious source URLs
+* Spreadsheet formula injection in exports
+* Corrupt generated JSON
+* Accidental publication of secrets
+* Leakage of scraping credentials or tokens
+
+Use repository secrets for any required credentials. Do not commit them.
+
+## 16. Implementation process
+
+Proceed in the following order.
+
+### Phase 1: source and feasibility investigation
+
+1. Inspect the complete repository, if one already exists.
+2. Inspect the MCA page and all types of linked provider documents.
+3. Identify the number and structure of official course lists.
+4. Determine how consistently provider data can be extracted.
+5. Select a representative sample of provider websites.
+6. Investigate how those providers publish dates and prices.
+7. Identify shared platforms and provider-specific differences.
+8. Review responsible collection constraints.
+9. Produce a data-coverage and feasibility assessment.
+10. Identify major unknowns and risks.
+
+### Phase 2: architecture decision
+
+Present:
+
+* The static architecture option
+* The serverless option
+* The backend/database option
+* A comparison table
+* Your recommended architecture
+* Why it is the simplest reliable choice
+* Expected free-tier or low-cost hosting implications
+* What would cause the architecture to need upgrading later
+
+Do not begin with an unnecessarily complex backend.
+
+### Phase 3: product specification
+
+Produce:
+
+* MVP scope
+* Explicit non-goals
+* User journeys
+* Information architecture
+* Interface wireframe descriptions
+* Data model
+* Data-source hierarchy
+* Freshness policy
+* Failure-handling policy
+* Coverage definition
+* Acceptance criteria
+
+### Phase 4: vertical slice
+
+Implement a complete vertical slice that includes:
+
+* Course discovery from the official source
+* Official-provider extraction
+* Normalised data generation
+* At least three representative courses
+* Providers with differing website structures
+* At least one provider with public dates and prices
+* At least one provider without public prices
+* Course search
+* Filters
+* Results list
+* Calendar or agenda view
+* Source links
+* Freshness indicators
+* Automated tests
+* A scheduled refresh workflow
+* A deployable frontend
+
+The vertical slice must use the intended production architecture and must not be throwaway code.
+
+### Phase 5: full official course catalogue
+
+Expand official-source ingestion so that every available MCA course can be browsed, even where provider dates and prices are unavailable.
+
+### Phase 6: provider coverage expansion
+
+Add provider adapters systematically.
+
+Prioritise providers based on:
+
+* Number of approved courses
+* Relevance to yacht crew
+* Availability of structured schedules
+* Reliability of public data
+* User value
+* Maintenance cost
+
+## 17. Required deliverables
+
+Create and maintain:
+
+* README.md
+* PRODUCT_REQUIREMENTS.md
+* ARCHITECTURE.md
+* DATA_SOURCES.md
+* DATA_MODEL.md
+* SCRAPING_POLICY.md
+* PROVIDER_COVERAGE.md
+* DEPLOYMENT.md
+* OPERATIONS.md
+* TESTING.md
+
+The README must explain:
+
+* What the application does
+* What it does not guarantee
+* How approval data differs from schedule data
+* How to run it locally
+* How to refresh data
+* How to add a provider adapter
+* How to run tests
+* How to deploy it
+* How to diagnose a failed refresh
+
+## 18. Behavioural constraints
+
+* Do not fabricate course information.
+* Do not fabricate provider schedules.
+* Do not fabricate prices.
+* Do not silently merge distinct qualifications.
+* Do not claim that every provider has been scraped successfully.
+* Do not hide stale data.
+* Do not remove a valid approved provider merely because schedule extraction failed.
+* Do not perform scraping directly in the user’s browser.
+* Do not introduce accounts or persistent user profiles.
+* Do not overengineer the MVP.
+* Do not sacrifice correctness or transparency for visual polish.
+* Do not rely on a large language model at runtime for deterministic course matching or data extraction.
+* Do not use paid infrastructure unless a free solution is demonstrably inadequate and the reason is explained.
+
+## 19. Initial response
+
+Begin by providing:
+
+1. Your understanding of the product.
+2. The distinction between official approval data and provider schedule data.
+3. Initial observations from inspecting the MCA source.
+4. The likely data-acquisition challenges.
+5. The architecture options you intend to evaluate.
+6. Up to three genuinely necessary questions that cannot be answered through research or sensible defaults.
+7. A concrete investigation and implementation plan.
+
+Do not begin coding until the initial source investigation and architecture recommendation have been presented.
+
+Once the important decisions are understood, proceed through implementation without repeatedly asking for approval for routine technical decisions. Document reasonable assumptions and continue.

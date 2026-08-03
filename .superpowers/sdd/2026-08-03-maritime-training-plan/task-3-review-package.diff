@@ -1,0 +1,261 @@
+diff --git a/pipeline/schemas/approval.schema.json b/pipeline/schemas/approval.schema.json
+new file mode 100644
+index 0000000..14c66c6
+--- /dev/null
++++ b/pipeline/schemas/approval.schema.json
+@@ -0,0 +1,16 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["course_id","provider_id","source_pdf_url","source_updated_date","status","first_seen","last_seen","not_open_to_public"],
++  "additionalProperties": false,
++  "properties": {
++    "course_id": {"type": "string"},
++    "provider_id": {"type": "string"},
++    "source_pdf_url": {"type": "string", "format": "uri"},
++    "source_updated_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "status": {"type": "string", "enum": ["active","removed"]},
++    "first_seen": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "last_seen": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "not_open_to_public": {"type": "boolean"}
++  }
++}
+diff --git a/pipeline/schemas/course.schema.json b/pipeline/schemas/course.schema.json
+new file mode 100644
+index 0000000..0cf3f8c
+--- /dev/null
++++ b/pipeline/schemas/course.schema.json
+@@ -0,0 +1,20 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["id","official_name","abbreviation","aliases","category","description","confusion_note","source_pdf_url","source_updated_date","provider_count","earliest_known_date","lowest_known_price_gbp"],
++  "additionalProperties": false,
++  "properties": {
++    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
++    "official_name": {"type": "string", "minLength": 1},
++    "abbreviation": {"type": ["string","null"]},
++    "aliases": {"type": "array", "items": {"type": "string"}},
++    "category": {"type": "string", "enum": ["stcw_basic","stcw_advanced","stcw_refresher","stcw_tanker","stcw_igf","stcw_helm","stcw_ecdis_naest","gmdss","high_voltage","security","deck_yacht","sv_engineering","engineering_other","polar","workboat","other"]},
++    "description": {"type": ["string","null"]},
++    "confusion_note": {"type": ["string","null"]},
++    "source_pdf_url": {"type": "string", "format": "uri"},
++    "source_updated_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "provider_count": {"type": "integer", "minimum": 0},
++    "earliest_known_date": {"type": ["string","null"]},
++    "lowest_known_price_gbp": {"type": ["number","null"], "minimum": 0}
++  }
++}
+diff --git a/pipeline/schemas/coverage_report.schema.json b/pipeline/schemas/coverage_report.schema.json
+new file mode 100644
+index 0000000..ecb427e
+--- /dev/null
++++ b/pipeline/schemas/coverage_report.schema.json
+@@ -0,0 +1,19 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["generated_at","total_courses","total_providers","total_approvals","providers_with_dates","providers_with_prices","providers_requiring_manual_review","providers_blocking_automated_collection","providers_no_public_schedule","last_successful_full_refresh","parse_failures"],
++  "additionalProperties": false,
++  "properties": {
++    "generated_at": {"type": "string"},
++    "total_courses": {"type": "integer"},
++    "total_providers": {"type": "integer"},
++    "total_approvals": {"type": "integer"},
++    "providers_with_dates": {"type": "integer"},
++    "providers_with_prices": {"type": "integer"},
++    "providers_requiring_manual_review": {"type": "integer"},
++    "providers_blocking_automated_collection": {"type": "integer"},
++    "providers_no_public_schedule": {"type": "integer"},
++    "last_successful_full_refresh": {"type": ["string","null"]},
++    "parse_failures": {"type": "array", "items": {"type": "object","required": ["provider_id","reason"],"properties": {"provider_id": {"type": "string"},"reason": {"type": "string"}}}}
++  }
++}
+diff --git a/pipeline/schemas/offering.schema.json b/pipeline/schemas/offering.schema.json
+new file mode 100644
+index 0000000..682075e
+--- /dev/null
++++ b/pipeline/schemas/offering.schema.json
+@@ -0,0 +1,24 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["id","course_id","provider_id","start_date","end_date","timezone","duration_days","price","currency","vat_included","delivery_format","availability","booking_url","source_url","last_verified","freshness_status"],
++  "additionalProperties": false,
++  "properties": {
++    "id": {"type": "string"},
++    "course_id": {"type": "string"},
++    "provider_id": {"type": "string"},
++    "start_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "end_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
++    "timezone": {"type": "string"},
++    "duration_days": {"type": ["number","null"]},
++    "price": {"type": ["number","null"], "minimum": 0},
++    "currency": {"type": ["string","null"]},
++    "vat_included": {"type": ["boolean","null"]},
++    "delivery_format": {"type": "string", "enum": ["in_person","blended","online","unknown"]},
++    "availability": {"type": ["string","null"]},
++    "booking_url": {"type": ["string","null"]},
++    "source_url": {"type": "string"},
++    "last_verified": {"type": "string"},
++    "freshness_status": {"type": "string", "enum": ["verified","recently_checked","stale","source_unavailable","no_public_schedule"]}
++  }
++}
+diff --git a/pipeline/schemas/provider.schema.json b/pipeline/schemas/provider.schema.json
+new file mode 100644
+index 0000000..3c1747b
+--- /dev/null
++++ b/pipeline/schemas/provider.schema.json
+@@ -0,0 +1,22 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["id","official_name","alt_names","address","city","region","country","postcode","lat","lng","website","email","telephone","not_open_to_public"],
++  "additionalProperties": false,
++  "properties": {
++    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
++    "official_name": {"type": "string", "minLength": 1},
++    "alt_names": {"type": "array", "items": {"type": "string"}},
++    "address": {"type": ["string","null"]},
++    "city": {"type": ["string","null"]},
++    "region": {"type": ["string","null"]},
++    "country": {"type": ["string","null"]},
++    "postcode": {"type": ["string","null"]},
++    "lat": {"type": ["number","null"]},
++    "lng": {"type": ["number","null"]},
++    "website": {"type": ["string","null"]},
++    "email": {"type": ["string","null"]},
++    "telephone": {"type": ["string","null"]},
++    "not_open_to_public": {"type": "boolean"}
++  }
++}
+diff --git a/pipeline/schemas/retrieval_log.schema.json b/pipeline/schemas/retrieval_log.schema.json
+new file mode 100644
+index 0000000..a91cf44
+--- /dev/null
++++ b/pipeline/schemas/retrieval_log.schema.json
+@@ -0,0 +1,17 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "type": "object",
++  "required": ["source_url","retrieved_at","http_status","content_hash","parser_id","parse_result","error_detail","offerings_found","previous_good_result_at"],
++  "additionalProperties": false,
++  "properties": {
++    "source_url": {"type": "string"},
++    "retrieved_at": {"type": "string"},
++    "http_status": {"type": ["integer","null"]},
++    "content_hash": {"type": ["string","null"]},
++    "parser_id": {"type": "string"},
++    "parse_result": {"type": "string", "enum": ["ok","failed","no_data"]},
++    "error_detail": {"type": ["string","null"]},
++    "offerings_found": {"type": "integer", "minimum": 0},
++    "previous_good_result_at": {"type": ["string","null"]}
++  }
++}
+diff --git a/pipeline/validate.py b/pipeline/validate.py
+new file mode 100644
+index 0000000..fd2e7f0
+--- /dev/null
++++ b/pipeline/validate.py
+@@ -0,0 +1,37 @@
++import json
++import logging
++from pathlib import Path
++
++import jsonschema
++
++_SCHEMA_DIR = Path(__file__).parent / "schemas"
++_schema_cache: dict[str, dict] = {}
++
++logger = logging.getLogger(__name__)
++
++
++def _load_schema(name: str) -> dict:
++    if name not in _schema_cache:
++        path = _SCHEMA_DIR / f"{name}.schema.json"
++        with path.open() as f:
++            _schema_cache[name] = json.load(f)
++    return _schema_cache[name]
++
++
++def validate_record(schema_name: str, record: dict) -> None:
++    """Validate record against named schema. Raises jsonschema.ValidationError on failure."""
++    schema = _load_schema(schema_name)
++    jsonschema.validate(record, schema)
++
++
++def validate_all(schema_name: str, records: list[dict]) -> list[dict]:
++    """Return only valid records; log and discard invalid ones."""
++    valid = []
++    for record in records:
++        try:
++            validate_record(schema_name, record)
++            valid.append(record)
++        except jsonschema.ValidationError as e:
++            identifier = record.get("id") or record.get("source_url") or "(unknown)"
++            logger.error("Schema validation failed for %s (%s): %s", schema_name, identifier, e.message)
++    return valid
+diff --git a/pytest.ini b/pytest.ini
+index 53f3ea0..a3dbff5 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -1,6 +1,7 @@
+ [pytest]
+ testpaths = tests
+ python_files = test_*.py
+ python_classes = Test*
+ python_functions = test_*
+ addopts = --tb=short
++pythonpath = .
+diff --git a/tests/pipeline/test_validate.py b/tests/pipeline/test_validate.py
+new file mode 100644
+index 0000000..a28a5ef
+--- /dev/null
++++ b/tests/pipeline/test_validate.py
+@@ -0,0 +1,46 @@
++import pytest
++from pipeline.validate import validate_record, validate_all
++from jsonschema import ValidationError
++
++def test_valid_course_passes():
++    record = {
++        "id": "pst",
++        "official_name": "Personal Survival Techniques",
++        "abbreviation": "PST",
++        "aliases": [],
++        "category": "stcw_basic",
++        "description": None,
++        "confusion_note": None,
++        "source_pdf_url": "https://example.com/pst.pdf",
++        "source_updated_date": "2026-07-16",
++        "provider_count": 0,
++        "earliest_known_date": None,
++        "lowest_known_price_gbp": None,
++    }
++    validate_record("course", record)  # should not raise
++
++def test_course_missing_required_field_fails():
++    with pytest.raises(ValidationError):
++        validate_record("course", {"id": "pst"})  # missing official_name etc.
++
++def test_validate_all_filters_invalid(capsys):
++    records = [
++        {
++            "id": "pst",
++            "official_name": "PST",
++            "abbreviation": "PST",
++            "aliases": [],
++            "category": "stcw_basic",
++            "description": None,
++            "confusion_note": None,
++            "source_pdf_url": "https://example.com/pst.pdf",
++            "source_updated_date": "2026-07-16",
++            "provider_count": 0,
++            "earliest_known_date": None,
++            "lowest_known_price_gbp": None,
++        },
++        {"id": "bad"},  # invalid
++    ]
++    valid = validate_all("course", records)
++    assert len(valid) == 1
++    assert valid[0]["id"] == "pst"
