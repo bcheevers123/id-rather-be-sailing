@@ -11,7 +11,7 @@ export function CourseResults() {
   const { id } = useParams<{ id: string }>()
   const { courses, providers, approvals, offerings, loading, error } = useData()
   const [searchParams, setSearchParams] = useSearchParams()
-  const filters = decodeFilters(searchParams)
+  const filters = useMemo(() => decodeFilters(searchParams), [searchParams])
 
   const course = useMemo(() => courses.find(c => c.id === id), [courses, id])
 
