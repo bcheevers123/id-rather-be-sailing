@@ -5,7 +5,7 @@ import { format, parse, startOfWeek, getDay, addMonths } from 'date-fns'
 import { enGB } from 'date-fns/locale'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useData } from '../hooks/useData'
-import { toCalendarEvents } from '../lib/calendarEvents'
+import { toCalendarEvents, courseColour } from '../lib/calendarEvents'
 import type { CalEvent } from '../lib/calendarEvents'
 import { safeHref } from '../lib/safeHref'
 
@@ -16,6 +16,21 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales: { 'en-GB': enGB },
 })
+
+function eventStyleGetter(event: CalEvent) {
+  return {
+    style: {
+      backgroundColor: event.color,
+      border: 'none',
+      borderRadius: '2px',
+      color: '#fff',
+      fontFamily: 'var(--font-data)',
+      fontSize: '0.7rem',
+      fontWeight: 600,
+      padding: '1px 5px',
+    },
+  }
+}
 
 export function CalendarView() {
   const { courses, providers, offerings, loading, error } = useData()
@@ -41,6 +56,21 @@ export function CalendarView() {
     () => toCalendarEvents(filteredOfferings, courses, providers),
     [filteredOfferings, courses, providers]
   )
+
+  // Unique courses present in the visible events — for the legend
+  const legendCourses = useMemo(() => {
+    const seen = new Map<string, { name: string; color: string }>()
+    for (const e of events) {
+      const c = e.resource.course
+      if (!seen.has(c.id)) {
+        seen.set(c.id, {
+          name: c.abbreviation ?? c.official_name,
+          color: courseColour(c.id, c.category),
+        })
+      }
+    }
+    return Array.from(seen.values())
+  }, [events])
 
   const handleSelectEvent = useCallback((event: CalEvent) => {
     const url = safeHref(event.resource.offering.booking_url)
@@ -86,6 +116,32 @@ export function CalendarView() {
         </p>
       </div>
 
+      {/* Colour legend */}
+      {legendCourses.length > 0 && (
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.5rem 1rem',
+          marginBottom: '0.875rem',
+        }}>
+          {legendCourses.map(({ name, color }) => (
+            <span key={name} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span style={{
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: 2,
+                background: color,
+                flexShrink: 0,
+              }} />
+              <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.68rem', color: 'var(--ink-muted)', letterSpacing: '0.03em' }}>
+                {name}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
+
       <div
         aria-label="Course calendar"
         style={{
@@ -110,6 +166,7 @@ export function CalendarView() {
           culture="en-GB"
           showAllEvents
           style={{ height: 700 }}
+          eventPropGetter={eventStyleGetter}
           tooltipAccessor={(e: CalEvent) => {
             const { offering, course, provider } = e.resource
             const price = offering.price

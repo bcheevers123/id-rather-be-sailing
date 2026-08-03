@@ -235,7 +235,7 @@
 .rbc-off-range-bg { background: var(--paper) !important; }
 .rbc-today { background: var(--soundings-bg) !important; }
 .rbc-event {
-  background: var(--chart-red) !important;
+  /* colour set per-event via eventPropGetter — only structural defaults here */
   border: none !important;
   border-radius: 2px !important;
   color: #fff !important;
@@ -243,9 +243,10 @@
   font-size: 0.7rem;
   font-weight: 600;
   padding: 1px 5px;
+  opacity: 1;
 }
 .rbc-event:hover, .rbc-event:focus {
-  background: var(--chart-red-dim) !important;
+  filter: brightness(1.12);
 }
 .rbc-toolbar button {
   color: var(--navy-600);

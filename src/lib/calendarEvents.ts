@@ -11,7 +11,45 @@ export interface CalEvent {
   title: string
   start: Date
   end: Date
+  color: string
   resource: CalEventResource
+}
+
+// Muted Admiralty palette — one distinct colour per course, easy on the eye
+const COURSE_COLOURS: Record<string, string> = {
+  // STCW Basic
+  pst:  'oklch(44% 0.10 248)',   // deep soundings blue — survival at sea
+  efa:  'oklch(44% 0.12 158)',   // teal-green — first aid / medical
+  fpff: 'oklch(42% 0.11 38)',    // warm amber-brown — fire
+  pssr: 'oklch(42% 0.10 290)',   // slate purple — safety/social
+  // STCW Advanced
+  aff:  'oklch(40% 0.13 35)',    // deep amber — advanced fire
+  pscrb:'oklch(40% 0.09 220)',   // slate blue — rescue boats
+  mfa:  'oklch(40% 0.11 155)',   // forest green — medical first aid
+  mc:   'oklch(38% 0.10 152)',   // dark green — medical care
+  frb:  'oklch(38% 0.09 212)',   // navy — fast rescue
+  // Refreshers
+  upst: 'oklch(46% 0.08 248)',
+  ufpff:'oklch(44% 0.09 38)',
+  uaff: 'oklch(42% 0.10 35)',
+  upscrb:'oklch(42% 0.07 220)',
+}
+const CATEGORY_COLOURS: Record<string, string> = {
+  stcw_basic:     'oklch(44% 0.10 248)',
+  stcw_advanced:  'oklch(40% 0.11 35)',
+  stcw_refresher: 'oklch(46% 0.08 248)',
+  deck_yacht:     'oklch(42% 0.10 195)',
+  gmdss:          'oklch(42% 0.10 270)',
+  security:       'oklch(40% 0.09 300)',
+  workboat:       'oklch(40% 0.08 60)',
+  other:          'oklch(40% 0.06 240)',
+}
+const FALLBACK_COLOUR = 'oklch(40% 0.08 240)'
+
+export function courseColour(courseId: string, category?: string): string {
+  return COURSE_COLOURS[courseId]
+    ?? (category ? CATEGORY_COLOURS[category] : undefined)
+    ?? FALLBACK_COLOUR
 }
 
 export function toCalendarEvents(
@@ -43,6 +81,7 @@ export function toCalendarEvents(
       title,
       start,
       end: endDate,
+      color: courseColour(course.id, course.category),
       resource: { offering, course, provider },
     })
   }
