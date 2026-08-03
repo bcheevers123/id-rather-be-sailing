@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id","course_id","provider_id","start_date","end_date","timezone","duration_days","price","currency","vat_included","delivery_format","availability","booking_url","source_url","last_verified","freshness_status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string"},
+    "course_id": {"type": "string"},
+    "provider_id": {"type": "string"},
+    "start_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "end_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "timezone": {"type": "string"},
+    "duration_days": {"type": ["number","null"]},
+    "price": {"type": ["number","null"], "minimum": 0},
+    "currency": {"type": ["string","null"]},
+    "vat_included": {"type": ["boolean","null"]},
+    "delivery_format": {"type": "string", "enum": ["in_person","blended","online","unknown"]},
+    "availability": {"type": ["string","null"]},
+    "booking_url": {"type": ["string","null"]},
+    "source_url": {"type": "string"},
+    "last_verified": {"type": "string"},
+    "freshness_status": {"type": "string", "enum": ["verified","recently_checked","stale","source_unavailable","no_public_schedule"]}
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["generated_at","total_courses","total_providers","total_approvals","providers_with_dates","providers_with_prices","providers_requiring_manual_review","providers_blocking_automated_collection","providers_no_public_schedule","last_successful_full_refresh","parse_failures"],
+  "additionalProperties": false,
+  "properties": {
+    "generated_at": {"type": "string"},
+    "total_courses": {"type": "integer"},
+    "total_providers": {"type": "integer"},
+    "total_approvals": {"type": "integer"},
+    "providers_with_dates": {"type": "integer"},
+    "providers_with_prices": {"type": "integer"},
+    "providers_requiring_manual_review": {"type": "integer"},
+    "providers_blocking_automated_collection": {"type": "integer"},
+    "providers_no_public_schedule": {"type": "integer"},
+    "last_successful_full_refresh": {"type": ["string","null"]},
+    "parse_failures": {"type": "array", "items": {"type": "object","required": ["provider_id","reason"],"properties": {"provider_id": {"type": "string"},"reason": {"type": "string"}}}}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["source_url","retrieved_at","http_status","content_hash","parser_id","parse_result","error_detail","offerings_found","previous_good_result_at"],
+  "additionalProperties": false,
+  "properties": {
+    "source_url": {"type": "string"},
+    "retrieved_at": {"type": "string"},
+    "http_status": {"type": ["integer","null"]},
+    "content_hash": {"type": ["string","null"]},
+    "parser_id": {"type": "string"},
+    "parse_result": {"type": "string", "enum": ["ok","failed","no_data"]},
+    "error_detail": {"type": ["string","null"]},
+    "offerings_found": {"type": "integer", "minimum": 0},
+    "previous_good_result_at": {"type": ["string","null"]}
+  }
+}
