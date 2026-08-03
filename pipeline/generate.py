@@ -14,6 +14,9 @@ from pathlib import Path
 import requests
 
 from pipeline.adapters.arlo import ArloAdapter
+from pipeline.adapters.uksa import UKSAAdapter, COURSE_URLS as UKSA_COURSE_URLS
+from pipeline.adapters.stream_marine import StreamMarineAdapter
+from pipeline.adapters.you_and_sea import YouAndSeaAdapter
 from pipeline.change_detector import detect_changes
 from pipeline.freshness import compute_freshness
 from pipeline.mca_source import PdfLink, download_mca_page, fetch_pdf_links
@@ -33,6 +36,23 @@ ARLO_ADAPTERS: dict[str, list[dict]] = {
     "pst": [
         {"subdomain": "maritimeskillsacademy", "course_path": "/courses/stcw-basic-safety-training", "provider_id": "maritime-skills-academy-dover-part-of-viking-maritime-group"},
     ],
+}
+
+# You and Sea Ltd — calendar page is Squarespace JS-rendered; adapter returns []
+# unless SSR event markup becomes available
+YOU_AND_SEA_ADAPTERS: dict[str, str] = {
+    "pst": "https://youandsea.com/course-calendar",
+    "fpff": "https://youandsea.com/course-calendar",
+    "efa": "https://youandsea.com/course-calendar",
+    "pssr": "https://youandsea.com/course-calendar",
+}
+
+# Stream Marine uses Arlo-hosted event pages for each course
+STREAM_MARINE_ADAPTERS: dict[str, str] = {
+    "fpff": "https://streammarinetraining.com/arlo/events/5-stcw-fire-prevention-and-fire-fighting-fpff/",
+    "efa": "https://streammarinetraining.com/arlo/events/8-stcw-elementary-first-aid-efa/",
+    "pssr": "https://streammarinetraining.com/arlo/events/305-stcw-personal-safety-and-social-responsibility-stcw-security-awareness-pssrsa/",
+    # PST is not offered separately by Stream Marine; it is bundled in the BSW (Basic Safety Training Week)
 }
 
 COURSE_NAME_TO_SLUG: dict[str, str] = {
@@ -272,6 +292,42 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
             for o in raw_offerings:
                 o.freshness_status = compute_freshness(o.last_verified, now_iso)
                 offerings.append(o.to_dict())
+
+    # UKSA adapter
+    for course_id in UKSA_COURSE_URLS:
+        provider = providers_by_id.get("united-kingdom-sailing-academy-uksa")
+        if not provider:
+            logger.warning("UKSA provider not found in providers_by_id")
+            continue
+        adapter = UKSAAdapter(course_id)
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Stream Marine adapter
+    for course_id, source_url in STREAM_MARINE_ADAPTERS.items():
+        provider = providers_by_id.get("stream-marine-training")
+        if not provider:
+            logger.warning("Stream Marine provider not found in providers_by_id")
+            continue
+        adapter = StreamMarineAdapter(course_id, source_url)
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # You and Sea adapter
+    for course_id, source_url in YOU_AND_SEA_ADAPTERS.items():
+        provider = providers_by_id.get("you-and-sea-ltd")
+        if not provider:
+            logger.warning("You and Sea provider not found in providers_by_id")
+            continue
+        adapter = YouAndSeaAdapter(course_id, source_url)
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
 
     valid_offerings = validate_all("offering", offerings)
 

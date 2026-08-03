@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)"
 
 COURSE_URLS = {
-    "pst": "https://www.uksa.org/courses/mca-personal-survival-techniques-pst",
-    "fpff": "https://www.uksa.org/courses/mca-fire-prevention-fire-fighting-fpff",
-    "efa": "https://www.uksa.org/courses/mca-elementary-first-aid-efa",
-    "pssr": "https://www.uksa.org/courses/mca-personal-safety-social-responsibility-pssr",
+    "pst": "https://www.uksa.org/course/personal-survival-techniques/",
+    "fpff": "https://www.uksa.org/course/fire-prevention-and-fire-fighting/",
+    "efa": "https://www.uksa.org/course/elementary-first-aid/",
+    "pssr": "https://www.uksa.org/course/personal-safety-and-social-responsibility/",
 }
 
 # Match date strings like "10 August 2026" or "10 Aug 2026"

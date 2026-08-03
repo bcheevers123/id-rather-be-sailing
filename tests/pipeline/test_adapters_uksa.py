@@ -9,7 +9,7 @@ PROVIDER = {"id": "united-kingdom-sailing-academy-uksa", "official_name": "UKSA"
 @responses.activate
 def test_uksa_fetch_returns_list():
     responses.add(responses.GET,
-        "https://www.uksa.org/courses/mca-personal-survival-techniques-pst",
+        "https://www.uksa.org/course/personal-survival-techniques/",
         body=FIXTURE, status=200)
     adapter = UKSAAdapter("pst")
     result = adapter.fetch(PROVIDER)
@@ -19,7 +19,7 @@ def test_uksa_fetch_returns_list():
 @responses.activate
 def test_uksa_http_error_returns_empty():
     responses.add(responses.GET,
-        "https://www.uksa.org/courses/mca-personal-survival-techniques-pst",
+        "https://www.uksa.org/course/personal-survival-techniques/",
         status=404)
     adapter = UKSAAdapter("pst")
     result = adapter.fetch(PROVIDER)
