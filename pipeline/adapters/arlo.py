@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from datetime import datetime, timezone
 
 import requests
@@ -7,6 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dateutil_parser
 
 from pipeline.adapters.base import BaseAdapter, Offering
+from pipeline.normalise import safe_url
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +33,7 @@ class ArloAdapter(BaseAdapter):
         try:
             resp = session.get(self.source_url, timeout=20)
             resp.raise_for_status()
+            time.sleep(2)
         except Exception as e:
             logger.warning("Arlo fetch failed for %s: %s", self.source_url, e)
             return []
@@ -66,7 +69,7 @@ class ArloAdapter(BaseAdapter):
                 end_date = start_date
 
             price, vat_included = _extract_price(container)
-            booking_url = _extract_booking_url(container)
+            booking_url = safe_url(_extract_booking_url(container))
             availability = _extract_availability(container)
 
             offering_id = f"{self.course_id}-{provider['id']}-{start_date}"[:80]

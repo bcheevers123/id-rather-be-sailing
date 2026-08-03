@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)"
 
-DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "src" / "data"
+DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "public" / "data"
 
 ARLO_ADAPTERS: dict[str, list[dict]] = {
     "pst": [
@@ -150,7 +150,7 @@ def download_pdf(url: str, session: requests.Session, dest_dir: Path) -> Path | 
     if dest.exists():
         return dest
     try:
-        time.sleep(1)
+        time.sleep(2)
         resp = session.get(url, timeout=30, headers={"User-Agent": USER_AGENT})
         resp.raise_for_status()
         dest.write_bytes(resp.content)
@@ -183,6 +183,7 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
     approvals: list[dict] = []
     parse_failures: list[dict] = []
     existing_slugs: set[str] = set()
+    raw_name_to_provider_id: dict[str, str] = {}
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
@@ -202,7 +203,7 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
                 logger.error("Parse error for %s: %s", course_id, e)
                 continue
 
-            time.sleep(1)
+            time.sleep(2)
 
             for raw in parsed.providers:
                 provider_dict = normalise_provider(
@@ -214,9 +215,10 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
                 pid = provider_dict["id"]
                 if pid not in providers_by_id:
                     providers_by_id[pid] = provider_dict
+                raw_name_to_provider_id[raw.raw_name] = pid
 
             for raw_approval in parsed.approvals:
-                pid = make_slug(raw_approval.raw_provider_name)
+                pid = raw_name_to_provider_id.get(raw_approval.raw_provider_name) or make_slug(raw_approval.raw_provider_name)
                 approvals.append({
                     "course_id": raw_approval.course_id,
                     "provider_id": pid,
@@ -242,6 +244,16 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
                 "earliest_known_date": None,
                 "lowest_known_price_gbp": None,
             })
+
+    # Deduplicate approvals by (course_id, provider_id) - keep first seen
+    seen_approval_keys: set[tuple[str, str]] = set()
+    deduped_approvals: list[dict] = []
+    for a in approvals:
+        key = (a["course_id"], a["provider_id"])
+        if key not in seen_approval_keys:
+            seen_approval_keys.add(key)
+            deduped_approvals.append(a)
+    approvals = deduped_approvals
 
     valid_courses = validate_all("course", courses)
     valid_providers = validate_all("provider", list(providers_by_id.values()))

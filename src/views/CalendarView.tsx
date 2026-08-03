@@ -7,6 +7,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useData } from '../hooks/useData'
 import { toCalendarEvents } from '../lib/calendarEvents'
 import type { CalEvent } from '../lib/calendarEvents'
+import { safeHref } from '../lib/safeHref'
 
 const localizer = dateFnsLocalizer({
   format,
@@ -43,8 +44,9 @@ export function CalendarView() {
 
   const handleSelectEvent = useCallback((event: CalEvent) => {
     const { offering } = event.resource
-    if (offering.booking_url) {
-      window.open(offering.booking_url, '_blank', 'noopener,noreferrer')
+    const url = safeHref(offering.booking_url)
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer')
     }
   }, [])
 

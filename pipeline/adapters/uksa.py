@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dateutil_parser
 
 from pipeline.adapters.base import BaseAdapter, Offering
+from pipeline.normalise import safe_url
 
 logger = logging.getLogger(__name__)
 USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)"
@@ -65,7 +66,7 @@ class UKSAAdapter(BaseAdapter):
                         continue
                     seen_dates.add(d)
                     link = el.find("a", href=True)
-                    booking = link["href"] if link else self.source_url
+                    booking = safe_url(link["href"] if link else self.source_url)
                     offerings.append(Offering(
                         id=f"{self.course_id}-uksa-{d}",
                         course_id=self.course_id,
@@ -110,7 +111,7 @@ class UKSAAdapter(BaseAdapter):
                             vat_included=None,
                             delivery_format="in_person",
                             availability=None,
-                            booking_url=self.source_url,
+                            booking_url=safe_url(self.source_url),
                             source_url=self.source_url,
                             last_verified=now,
                             freshness_status="verified",

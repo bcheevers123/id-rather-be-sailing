@@ -2,6 +2,16 @@ import re
 import unicodedata
 
 
+def safe_url(url: str | None) -> str | None:
+    """Accept only http/https URLs. Returns None for anything else."""
+    if not url:
+        return None
+    url = url.strip()
+    if url.startswith(("http://", "https://")):
+        return url
+    return None
+
+
 def make_slug(text: str, existing: set[str] | None = None) -> str:
     """Convert display text to a stable URL-safe slug."""
     text = unicodedata.normalize("NFKD", text)
@@ -54,7 +64,7 @@ def normalise_provider(raw_name: str, location: str, address: str, contact_detai
         "postcode": None,
         "lat": None,
         "lng": None,
-        "website": contact["website"],
+        "website": safe_url(contact["website"]),
         "email": contact["email"],
         "telephone": contact["telephone"],
         "not_open_to_public": not_open_to_public,

@@ -28,6 +28,12 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Add SPA 404 fallback
+        run: cp dist/index.html dist/404.html
+
+      - name: Smoke-check data directory
+        run: test -d dist/data || (echo "ERROR: dist/data/ missing — pipeline output not in public/data/" && exit 1)
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

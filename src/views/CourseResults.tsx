@@ -6,6 +6,7 @@ import { decodeFilters, encodeFilters } from '../lib/urls'
 import { ProviderResultCard } from '../components/ProviderResult'
 import { FilterPanel } from '../components/FilterPanel'
 import { DisambiguationBanner } from '../components/DisambiguationBanner'
+import { safeHref } from '../lib/safeHref'
 
 export function CourseResults() {
   const { id } = useParams<{ id: string }>()
@@ -57,7 +58,7 @@ export function CourseResults() {
         {course.description && <p className="mt-2 text-gray-600">{course.description}</p>}
         <p className="mt-2 text-xs text-gray-400">
           MCA source:{' '}
-          <a href={course.source_pdf_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
+          <a href={safeHref(course.source_pdf_url) ?? '#'} target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
             Official provider list
           </a>{' '}
           (updated {course.source_updated_date})

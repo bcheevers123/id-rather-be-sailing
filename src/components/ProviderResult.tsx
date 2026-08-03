@@ -1,5 +1,6 @@
 import { FreshnessBadge } from './FreshnessBadge'
 import type { ProviderResult as ProviderResultType } from '../lib/filters'
+import { safeHref } from '../lib/safeHref'
 
 interface Props {
   result: ProviderResultType
@@ -28,8 +29,8 @@ export function ProviderResultCard({ result }: Props) {
       </div>
 
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        {provider.website && (
-          <a href={provider.website} target="_blank" rel="noopener noreferrer"
+        {safeHref(provider.website) && (
+          <a href={safeHref(provider.website)} target="_blank" rel="noopener noreferrer"
             className="text-navy-700 underline hover:text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-600">
             Website
           </a>
@@ -60,8 +61,8 @@ export function ProviderResultCard({ result }: Props) {
                 ) : (
                   <span className="text-gray-400">Price not published</span>
                 )}
-                {o.booking_url && (
-                  <a href={o.booking_url} target="_blank" rel="noopener noreferrer"
+                {safeHref(o.booking_url) && (
+                  <a href={safeHref(o.booking_url)} target="_blank" rel="noopener noreferrer"
                     className="text-navy-700 underline text-xs hover:text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-600">
                     Book →
                   </a>

@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dateutil_parser
 
 from pipeline.adapters.base import BaseAdapter, Offering
+from pipeline.normalise import safe_url
 
 logger = logging.getLogger(__name__)
 USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)"
@@ -78,7 +79,7 @@ class StreamMarineAdapter(BaseAdapter):
                     vat_included=vat_included,
                     delivery_format="in_person",
                     availability=None,
-                    booking_url=link["href"] if link else self.source_url,
+                    booking_url=safe_url(link["href"] if link else self.source_url),
                     source_url=self.source_url,
                     last_verified=now,
                     freshness_status="verified",
@@ -115,7 +116,7 @@ class StreamMarineAdapter(BaseAdapter):
                         vat_included=vat_included,
                         delivery_format="in_person",
                         availability=None,
-                        booking_url=link["href"] if link else self.source_url,
+                        booking_url=safe_url(link["href"] if link else self.source_url),
                         source_url=self.source_url,
                         last_verified=now,
                         freshness_status="verified",
