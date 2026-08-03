@@ -188,8 +188,8 @@ export function Catalogue() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Hero header — chart title block */}
       <div style={{
-        borderLeft: '4px solid var(--chart-red)',
-        paddingLeft: '1rem',
+        borderTop: '3px solid var(--chart-red)',
+        paddingTop: '0.875rem',
         marginBottom: '1.5rem',
       }}>
         <h1 style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>
