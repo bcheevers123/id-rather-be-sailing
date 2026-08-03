@@ -20,8 +20,8 @@ const localizer = dateFnsLocalizer({
 
 function eventStyleGetter(event: CalEvent) {
   return {
-    // Set as CSS custom property so the !important rule in index.css picks it up
     style: { '--rbc-event-bg': event.color } as React.CSSProperties,
+    className: `rbc-course-event`,
   }
 }
 
@@ -158,6 +158,7 @@ export function CalendarView() {
           views={[Views.MONTH, Views.AGENDA]}
           culture="en-GB"
           showAllEvents
+          allDayAccessor="allDay"
           style={{ height: 700 }}
           eventPropGetter={eventStyleGetter}
           tooltipAccessor={(e: CalEvent) => {

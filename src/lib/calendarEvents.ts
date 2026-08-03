@@ -11,6 +11,7 @@ export interface CalEvent {
   title: string
   start: Date
   end: Date
+  allDay: true
   color: string
   resource: CalEventResource
 }
@@ -81,6 +82,7 @@ export function toCalendarEvents(
       title,
       start,
       end: endDate,
+      allDay: true,
       color: courseColour(course.id, course.category),
       resource: { offering, course, provider },
     })

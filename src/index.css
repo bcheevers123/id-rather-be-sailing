@@ -248,6 +248,20 @@
 .rbc-event:hover, .rbc-event:focus {
   filter: brightness(1.15);
 }
+/* Agenda view — event link inherits the same colour */
+.rbc-agenda-event-cell .rbc-event,
+.rbc-agenda-view .rbc-event {
+  background-color: var(--rbc-event-bg, oklch(40% 0.08 240)) !important;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  color: #fff !important;
+}
+/* Remove the default agenda event link underline */
+.rbc-agenda-event-cell a {
+  color: inherit;
+  text-decoration: none;
+}
 .rbc-toolbar button {
   color: var(--navy-600);
   border: 1px solid var(--border-strong);
