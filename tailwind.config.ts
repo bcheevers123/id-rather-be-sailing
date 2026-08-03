@@ -5,7 +5,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Semantic CSS-variable tokens — use as text-ink, bg-surface, etc.
         ink:           'var(--ink)',
         'ink-muted':   'var(--ink-muted)',
         'ink-faint':   'var(--ink-faint)',
@@ -17,19 +16,19 @@ export default {
         accent:        'var(--accent)',
         'accent-dim':  'var(--accent-dim)',
         'accent-tint': 'var(--accent-tint)',
-        phosphor:      'var(--phosphor)',
-        // Water ramp for direct use
-        water: {
-          900: 'var(--water-900)',
-          800: 'var(--water-800)',
-          700: 'var(--water-700)',
-          600: 'var(--water-600)',
-          500: 'var(--water-500)',
-          400: 'var(--water-400)',
-          300: 'var(--water-300)',
-          200: 'var(--water-200)',
-          100: 'var(--water-100)',
-          50:  'var(--water-50)',
+        paper:         'var(--paper)',
+        'paper-sea':   'var(--paper-sea)',
+        'paper-deep':  'var(--paper-deep)',
+        soundings:     'var(--soundings)',
+        navy: {
+          950: 'var(--navy-950)',
+          900: 'var(--navy-900)',
+          800: 'var(--navy-800)',
+          600: 'var(--navy-600)',
+          400: 'var(--navy-400)',
+          200: 'var(--navy-200)',
+          100: 'var(--navy-100)',
+          50:  'var(--navy-50)',
         },
       },
       borderColor: {
@@ -37,8 +36,9 @@ export default {
         strong:  'var(--border-strong)',
       },
       fontFamily: {
-        data: 'var(--font-data)',
         ui:   'var(--font-ui)',
+        sans: 'var(--font-sans)',
+        data: 'var(--font-data)',
       },
     },
   },

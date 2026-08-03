@@ -11,20 +11,14 @@ export function SearchBar({ value, onChange, placeholder = 'Search courses…' }
   return (
     <div className="relative w-full">
       <label htmlFor={id} className="sr-only">Search maritime training courses</label>
-      {/* Crosshair / plotter icon */}
       <svg
         aria-hidden="true"
         width="15" height="15"
-        viewBox="0 0 16 16" fill="none" stroke="currentColor"
-        strokeWidth="1.5" strokeLinecap="round"
+        viewBox="0 0 20 20" fill="currentColor"
         className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
         style={{ color: 'var(--ink-faint)' }}
       >
-        <circle cx="8" cy="8" r="4"/>
-        <line x1="8" y1="1" x2="8" y2="4"/>
-        <line x1="8" y1="12" x2="8" y2="15"/>
-        <line x1="1" y1="8" x2="4" y2="8"/>
-        <line x1="12" y1="8" x2="15" y2="8"/>
+        <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
       </svg>
       <input
         id={id}
@@ -38,18 +32,18 @@ export function SearchBar({ value, onChange, placeholder = 'Search courses…' }
           background: 'var(--surface)',
           color: 'var(--ink)',
           border: '1px solid var(--border-strong)',
-          borderRadius: '4px',
-          fontFamily: 'var(--font-ui)',
-          fontSize: '0.875rem',
+          borderRadius: '3px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '0.9375rem',
           width: '100%',
           paddingLeft: '2.5rem',
           paddingRight: value ? '2.5rem' : '0.875rem',
-          paddingTop: '0.5rem',
-          paddingBottom: '0.5rem',
+          paddingTop: '0.55rem',
+          paddingBottom: '0.55rem',
           outline: 'none',
-          transition: 'border-color 100ms',
+          transition: 'border-color 120ms, box-shadow 120ms',
         }}
-        className="placeholder:text-[var(--ink-faint)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
+        className="placeholder:text-[var(--ink-faint)] focus:border-[var(--navy-600)] focus:shadow-[0_0_0_3px_oklch(94%_0.008_238)]"
       />
       {value && (
         <button

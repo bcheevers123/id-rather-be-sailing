@@ -9,16 +9,14 @@ export function DisambiguationBanner({ note }: Props) {
       role="note"
       style={{
         background: 'var(--warn-bg)',
-        border: '1px solid oklch(40% 0.12 80 / 0.5)',
-        borderRadius: '4px',
+        border: '1px solid oklch(72% 0.08 70)',
         padding: '0.625rem 0.875rem',
-        fontSize: '0.8rem',
+        fontSize: '0.8125rem',
         color: 'var(--warn)',
         marginBottom: '1rem',
         display: 'flex',
         gap: '0.5rem',
         alignItems: 'flex-start',
-        fontFamily: 'var(--font-data)',
       }}
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"

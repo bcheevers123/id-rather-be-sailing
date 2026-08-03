@@ -31,27 +31,15 @@ export function CourseCard({ course }: Props) {
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
-        borderRadius: '4px',
         display: 'flex',
         alignItems: 'center',
         gap: '0.75rem',
-        padding: '0.65rem 0.875rem',
+        padding: '0.6rem 0.875rem',
         textDecoration: 'none',
-        transition: 'border-color 100ms, background 100ms',
+        transition: 'border-color 120ms, background 120ms',
       }}
-      className="group focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--phosphor)] hover:border-[var(--accent)] hover:bg-[var(--surface-2)]"
+      className="group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chart-red)] hover:border-[var(--border-strong)] hover:bg-[var(--paper)]"
     >
-      {/* AIS-style side marker */}
-      <div style={{
-        width: '3px',
-        alignSelf: 'stretch',
-        borderRadius: '2px',
-        background: 'var(--accent-tint)',
-        borderLeft: '2px solid var(--accent)',
-        flexShrink: 0,
-        transition: 'border-color 100ms',
-      }} className="group-hover:border-[var(--phosphor)]" aria-hidden="true" />
-
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
           <span className="cat-chip">{catLabel}</span>
@@ -67,33 +55,37 @@ export function CourseCard({ course }: Props) {
             </span>
           )}
         </div>
-        <div style={{ color: 'var(--ink)', fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}
-          className="group-hover:text-[var(--accent)] transition-colors">
+        <div style={{
+          fontFamily: 'var(--font-ui)',
+          color: 'var(--navy-950)',
+          fontSize: '0.9375rem',
+          fontWeight: 700,
+          lineHeight: 1.3,
+        }} className="group-hover:text-[var(--chart-red)] transition-colors">
           {course.official_name}
         </div>
       </div>
 
-      {/* Data column — right side */}
+      {/* Right-hand data column */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: '0.2rem',
+        gap: '0.15rem',
         flexShrink: 0,
       }}>
         <span style={{
           fontFamily: 'var(--font-data)',
-          fontSize: '0.72rem',
+          fontSize: '0.7rem',
           color: 'var(--ink-faint)',
-          letterSpacing: '0.01em',
         }}>
           {course.provider_count} {course.provider_count === 1 ? 'centre' : 'centres'}
         </span>
         {course.earliest_known_date ? (
           <span style={{
             fontFamily: 'var(--font-data)',
-            fontSize: '0.72rem',
-            color: 'var(--accent)',
+            fontSize: '0.7rem',
+            color: 'var(--soundings)',
             fontWeight: 600,
           }}>
             {course.earliest_known_date}
@@ -110,7 +102,7 @@ export function CourseCard({ course }: Props) {
         {course.lowest_known_price_gbp !== null && (
           <span style={{
             fontFamily: 'var(--font-data)',
-            fontSize: '0.72rem',
+            fontSize: '0.7rem',
             color: 'var(--ink-muted)',
           }}>
             £{course.lowest_known_price_gbp.toFixed(0)}+
@@ -118,11 +110,10 @@ export function CourseCard({ course }: Props) {
         )}
       </div>
 
-      {/* Chevron */}
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
         strokeWidth="2" strokeLinecap="round" aria-hidden="true"
         style={{ color: 'var(--ink-faint)', flexShrink: 0 }}
-        className="group-hover:text-[var(--accent)] transition-colors">
+        className="group-hover:text-[var(--chart-red)] transition-colors">
         <path d="M6 4l4 4-4 4"/>
       </svg>
     </Link>

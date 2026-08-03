@@ -90,7 +90,7 @@ export function CourseResults() {
       <Link
         to="/"
         className="inline-flex items-center gap-1.5 hover:underline mb-5"
-        style={{ color: 'var(--ink-faint)', fontSize: '0.78rem', fontFamily: 'var(--font-data)', letterSpacing: '0.01em', textDecoration: 'none' }}
+        style={{ color: 'var(--soundings)', fontSize: '0.875rem', textDecoration: 'none' }}
       >
         <BackArrow />
         ALL COURSES
@@ -98,15 +98,14 @@ export function CourseResults() {
 
       <header style={{ marginBottom: '1.5rem', marginTop: '0.75rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.375rem' }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '1.375rem' }}>
             {course.official_name}
           </h1>
           {course.abbreviation && (
             <code style={{
-              background: 'var(--accent-tint)',
-              color: 'var(--accent)',
-              border: '1px solid oklch(40% 0.14 155 / 0.4)',
-              borderRadius: '3px',
+              background: 'var(--paper-sea)',
+              color: 'var(--navy-800)',
+              border: '1px solid var(--border-strong)',
               padding: '0.1rem 0.45rem',
               fontSize: '0.75rem',
               fontFamily: 'var(--font-data)',

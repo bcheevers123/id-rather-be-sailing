@@ -55,7 +55,6 @@ function AccordionSection({
   return (
     <div style={{
       border: '1px solid var(--border)',
-      borderRadius: '4px',
       overflow: 'hidden',
       background: 'var(--surface)',
     }}>
@@ -68,16 +67,21 @@ function AccordionSection({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0.625rem 1rem',
-          background: isOpen ? 'var(--surface-2)' : 'var(--surface)',
+          background: isOpen ? 'var(--paper)' : 'var(--surface)',
           textAlign: 'left',
           cursor: 'pointer',
           border: 'none',
           transition: 'background 120ms',
           gap: '0.5rem',
         }}
-        className="hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset"
+        className="hover:bg-[var(--paper)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chart-red)] focus-visible:ring-inset"
       >
-        <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--ink)' }}>
+        <span style={{
+          fontFamily: 'var(--font-ui)',
+          fontWeight: 700,
+          fontSize: '0.9375rem',
+          color: 'var(--navy-950)',
+        }}>
           {CATEGORY_LABELS[cat]}
         </span>
         <div className="flex items-center gap-2 shrink-0">
@@ -86,8 +90,8 @@ function AccordionSection({
             fontSize: '0.68rem',
             fontWeight: 700,
             color: 'var(--ink-faint)',
-            background: 'var(--surface-3)',
-            borderRadius: '3px',
+            background: 'var(--paper-sea)',
+            border: '1px solid var(--border)',
             padding: '0.1rem 0.45rem',
             letterSpacing: '0.02em',
           }}>
@@ -103,7 +107,7 @@ function AccordionSection({
         transition: 'grid-template-rows 180ms cubic-bezier(0.4,0,0.2,1)',
       }}>
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ borderTop: '1px solid var(--border)', padding: '0.625rem', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+          <div style={{ borderTop: '1px solid var(--border)', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
             {courses.map(course => <CourseCard key={course.id} course={course} />)}
           </div>
         </div>
@@ -153,30 +157,22 @@ export function Catalogue() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-12">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{
-              height: '52px',
-              borderRadius: '8px',
-              background: 'var(--surface-3)',
-              animation: 'pulse 1.5s ease-in-out infinite',
-              animationDelay: `${i * 80}ms`,
-            }} />
+      <div className="mx-auto max-w-4xl px-4 py-10">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: '46px', animationDelay: `${i * 60}ms` }} />
           ))}
         </div>
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
-      </main>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-12 text-center">
-        <div role="alert" style={{
+      <div className="mx-auto max-w-4xl px-4 py-10" role="alert">
+        <div style={{
           background: 'var(--danger-bg)',
-          border: '1px solid oklch(40% 0.15 22 / 0.5)',
-          borderRadius: '4px',
+          border: '1px solid oklch(70% 0.10 24)',
           padding: '1rem',
           color: 'var(--danger)',
           fontFamily: 'var(--font-data)',
@@ -184,20 +180,24 @@ export function Catalogue() {
         }}>
           <strong>Failed to load data</strong><br />{error}
         </div>
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      {/* Page header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.375rem' }}>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      {/* Hero header — chart title block */}
+      <div style={{
+        borderLeft: '4px solid var(--chart-red)',
+        paddingLeft: '1rem',
+        marginBottom: '1.5rem',
+      }}>
+        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>
           MCA-Approved Maritime Training
         </h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', maxWidth: '60ch' }}>
-          Every course in the official MCA approved training providers list.
-          Approval status is authoritative; schedule availability varies by provider.
+        <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', maxWidth: '62ch', lineHeight: 1.6 }}>
+          Every course on the official MCA approved training providers list —
+          with live dates and prices from provider websites, refreshed daily.
         </p>
       </div>
 
@@ -216,13 +216,13 @@ export function Catalogue() {
               Try a different term or browse by category below.
             </p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {searchResults.map(course => <CourseCard key={course.id} course={course} />)}
             </div>
           )}
         </section>
       ) : (
-        <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
           {CATEGORY_ORDER.map(cat => {
             const catCourses = coursesByCategory.get(cat) ?? []
             if (catCourses.length === 0) return null
@@ -238,6 +238,6 @@ export function Catalogue() {
           })}
         </div>
       )}
-    </main>
+    </div>
   )
 }

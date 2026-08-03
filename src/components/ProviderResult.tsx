@@ -22,9 +22,7 @@ function GlobeIcon() {
   )
 }
 
-interface Props {
-  result: ProviderResultType
-}
+interface Props { result: ProviderResultType }
 
 export function ProviderResultCard({ result }: Props) {
   const { provider, approval, offerings } = result
@@ -40,15 +38,15 @@ export function ProviderResultCard({ result }: Props) {
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
-        borderRadius: '4px',
         overflow: 'hidden',
       }}
       aria-label={provider.official_name}
     >
-      {/* Header — vessel contact row */}
+      {/* Header — pilot book entry heading */}
       <div style={{
         padding: '0.75rem 1rem 0.625rem',
         borderBottom: '1px solid var(--border)',
+        background: 'var(--paper)',
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
@@ -56,12 +54,18 @@ export function ProviderResultCard({ result }: Props) {
         flexWrap: 'wrap',
       }}>
         <div className="min-w-0">
-          <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--ink)', lineHeight: 1.3 }}>
+          <div style={{
+            fontFamily: 'var(--font-ui)',
+            fontWeight: 700,
+            fontSize: '0.9375rem',
+            color: 'var(--navy-950)',
+            lineHeight: 1.3,
+          }}>
             {provider.official_name}
           </div>
           <div className="flex items-center flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
             {location && (
-              <span className="flex items-center gap-1" style={{ color: 'var(--ink-faint)', fontSize: '0.78rem' }}>
+              <span className="flex items-center gap-1" style={{ color: 'var(--ink-muted)', fontSize: '0.8rem' }}>
                 <MapPinIcon />
                 {location}
               </span>
@@ -69,13 +73,13 @@ export function ProviderResultCard({ result }: Props) {
             {websiteHref && (
               <a href={websiteHref} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-1 hover:underline"
-                style={{ color: 'var(--accent)', fontSize: '0.78rem' }}>
+                style={{ color: 'var(--soundings)', fontSize: '0.8rem' }}>
                 <GlobeIcon />
                 Website
               </a>
             )}
             {provider.telephone && (
-              <span style={{ color: 'var(--ink-faint)', fontSize: '0.78rem', fontFamily: 'var(--font-data)' }}>
+              <span style={{ color: 'var(--ink-muted)', fontSize: '0.8rem', fontFamily: 'var(--font-data)' }}>
                 {provider.telephone}
               </span>
             )}
@@ -84,21 +88,11 @@ export function ProviderResultCard({ result }: Props) {
         <FreshnessBadge status={overallStatus} />
       </div>
 
-      {/* Offerings — AIS contact schedule */}
+      {/* Schedule — pilot book timetable */}
       <div style={{ padding: '0.625rem 1rem' }}>
         {offerings.length > 0 ? (
           <>
-            <div style={{
-              fontFamily: 'var(--font-data)',
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--ink-faint)',
-              marginBottom: '0.375rem',
-            }}>
-              Upcoming dates
-            </div>
+            <p className="chart-label" style={{ marginBottom: '0.375rem' }}>Upcoming dates</p>
             <div>
               {offerings.slice(0, 5).map(o => {
                 const bookingHref = safeHref(o.booking_url)
@@ -107,20 +101,20 @@ export function ProviderResultCard({ result }: Props) {
                     <span style={{
                       fontFamily: 'var(--font-data)',
                       fontWeight: 700,
-                      fontSize: '0.78rem',
-                      color: 'var(--ink)',
+                      fontSize: '0.8125rem',
+                      color: 'var(--navy-950)',
                       fontVariantNumeric: 'tabular-nums',
                       whiteSpace: 'nowrap',
                     }}>
                       {o.start_date}{o.end_date && o.end_date !== o.start_date ? ` – ${o.end_date}` : ''}
                     </span>
                     {o.price !== null ? (
-                      <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.78rem', color: 'var(--ink-muted)' }}>
-                        <strong style={{ color: 'var(--ink)' }}>
+                      <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.8rem', color: 'var(--ink-muted)' }}>
+                        <strong style={{ color: 'var(--navy-950)' }}>
                           {o.currency === 'GBP' ? '£' : (o.currency ?? '£')}{o.price.toFixed(0)}
                         </strong>
                         {o.vat_included !== null && (
-                          <span style={{ color: 'var(--ink-faint)', fontSize: '0.7rem' }}>
+                          <span style={{ color: 'var(--ink-faint)', fontSize: '0.72rem' }}>
                             {' '}{o.vat_included ? 'inc.VAT' : 'ex.VAT'}
                           </span>
                         )}
@@ -137,7 +131,7 @@ export function ProviderResultCard({ result }: Props) {
                     )}
                     {bookingHref && (
                       <a href={bookingHref} target="_blank" rel="noopener noreferrer"
-                        className="btn-phosphor"
+                        className="btn-chart"
                         style={{ marginLeft: 'auto' }}>
                         Book →
                       </a>
@@ -148,7 +142,7 @@ export function ProviderResultCard({ result }: Props) {
             </div>
           </>
         ) : (
-          <p style={{ fontSize: '0.8rem', color: 'var(--ink-faint)', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', fontStyle: 'italic' }}>
             No public dates — contact provider directly
           </p>
         )}
@@ -156,10 +150,10 @@ export function ProviderResultCard({ result }: Props) {
 
       {/* Footer — source attribution */}
       <div style={{
-        padding: '0.375rem 1rem',
-        background: 'var(--water-800)',
+        padding: '0.35rem 1rem',
+        background: 'var(--paper)',
         borderTop: '1px solid var(--border)',
-        fontSize: '0.7rem',
+        fontSize: '0.68rem',
         color: 'var(--ink-faint)',
         fontFamily: 'var(--font-data)',
         letterSpacing: '0.01em',
