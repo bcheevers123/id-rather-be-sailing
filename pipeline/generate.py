@@ -15,6 +15,7 @@ import requests
 
 from pipeline.adapters.arlo import ArloAdapter
 from pipeline.adapters.blackpool import BlackpoolAdapter
+from pipeline.adapters.solent import SolentAdapter
 from pipeline.adapters.uksa import UKSAAdapter, COURSE_URLS as UKSA_COURSE_URLS
 from pipeline.adapters.stream_marine import StreamMarineAdapter
 from pipeline.adapters.you_and_sea import YouAndSeaAdapter
@@ -316,6 +317,17 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
             continue
         adapter = StreamMarineAdapter(course_id, source_url)
         raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Solent / Warsash adapter
+    solent_provider = providers_by_id.get("warsash-maritime-school-solent-university-southampton")
+    if not solent_provider:
+        logger.warning("Solent provider not found in providers_by_id")
+    else:
+        adapter = SolentAdapter()
+        raw_offerings = adapter.fetch(solent_provider)
         for o in raw_offerings:
             o.freshness_status = compute_freshness(o.last_verified, now_iso)
             offerings.append(o.to_dict())
