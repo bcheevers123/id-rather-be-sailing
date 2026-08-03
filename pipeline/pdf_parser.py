@@ -5,12 +5,10 @@ from pathlib import Path
 
 import pdfplumber
 
-from pipeline.normalise import make_slug, extract_contact_parts
-
 logger = logging.getLogger(__name__)
 
 _NOT_PUBLIC_RE = re.compile(r"not open to public", re.I)
-_OUTSIDE_UK_HEADING_RE = re.compile(r"outside.*uk|non.uk", re.I)
+_OUTSIDE_UK_HEADING_RE = re.compile(r"outside.*uk|non[- ]?uk", re.I)
 
 
 @dataclass
@@ -41,7 +39,8 @@ class ParsedPdf:
 def _clean(text: str | None) -> str:
     if not text:
         return ""
-    return " ".join(text.split())
+    # Collapse horizontal whitespace only; preserve newlines for contact parsing
+    return re.sub(r"[^\S\n]+", " ", text).strip()
 
 
 def parse_pdf(pdf_path: Path, course_id: str, pdf_url: str, source_updated_date: str) -> ParsedPdf:
