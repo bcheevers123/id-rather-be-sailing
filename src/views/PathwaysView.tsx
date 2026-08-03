@@ -327,9 +327,11 @@ export function PathwaysView() {
             }}>
               <div style={{
                 height: '100%',
-                width: `${total ? (done / total) * 100 : 0}%`,
+                width: '100%',
                 background: allDone ? 'var(--verified)' : 'var(--chart-red)',
-                transition: 'width 300ms ease-out, background 300ms',
+                transform: `scaleX(${total ? done / total : 0})`,
+                transformOrigin: 'left center',
+                transition: 'transform 300ms ease-out, background 300ms',
               }} />
             </div>
           </div>
