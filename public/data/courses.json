@@ -10,8 +10,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58dafb3ae256c99b702f1d/PST_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 36,
-    "earliest_known_date": null,
-    "lowest_known_price_gbp": null
+    "earliest_known_date": "2026-08-04",
+    "lowest_known_price_gbp": 875
   },
   {
     "id": "fpff",
@@ -24,8 +24,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58dadf60a6e36813cb4307/FPFF_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 24,
-    "earliest_known_date": null,
-    "lowest_known_price_gbp": null
+    "earliest_known_date": "2026-08-03",
+    "lowest_known_price_gbp": 525
   },
   {
     "id": "efa",
@@ -38,8 +38,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58dac824d4d0ad06d945cf/EFA_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 41,
-    "earliest_known_date": null,
-    "lowest_known_price_gbp": null
+    "earliest_known_date": "2026-08-04",
+    "lowest_known_price_gbp": 120
   },
   {
     "id": "pssr",
@@ -52,8 +52,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58daed7eb057103bd945c6/PSSR_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 32,
-    "earliest_known_date": null,
-    "lowest_known_price_gbp": null
+    "earliest_known_date": "2026-08-10",
+    "lowest_known_price_gbp": 189
   },
   {
     "id": "aff",

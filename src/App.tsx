@@ -4,6 +4,7 @@ import { CourseResults } from './views/CourseResults'
 import { CalendarView } from './views/CalendarView'
 import { PathwaysView } from './views/PathwaysView'
 import { ChartVesselsBackground } from './components/ChartVessels'
+import { RefreshCountdown } from './components/RefreshCountdown'
 
 function AnchorIcon() {
   return (
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="/pathways" element={<PathwaysView />} />
         </Routes>
       </main>
+      <RefreshCountdown />
     </BrowserRouter>
   )
 }

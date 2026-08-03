@@ -357,6 +357,24 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
 
     valid_offerings = validate_all("offering", offerings)
 
+    # Back-fill earliest_known_date and lowest_known_price_gbp into courses from live offerings
+    today_str = date.today().isoformat()
+    from collections import defaultdict
+    future_by_course: dict[str, list[dict]] = defaultdict(list)
+    for o in valid_offerings:
+        if o.get("start_date", "") >= today_str:
+            future_by_course[o["course_id"]].append(o)
+    for course in valid_courses:
+        cid = course["id"]
+        future = future_by_course.get(cid, [])
+        if future:
+            course["earliest_known_date"] = min(o["start_date"] for o in future)
+            gbp_prices = [o["price"] for o in future if o.get("currency") == "GBP" and o.get("price") is not None]
+            course["lowest_known_price_gbp"] = min(gbp_prices) if gbp_prices else None
+        else:
+            course["earliest_known_date"] = None
+            course["lowest_known_price_gbp"] = None
+
     report = build_coverage_report(valid_courses, valid_providers, valid_approvals, valid_offerings, parse_failures)
 
     _write_json(out_dir / "courses.json", valid_courses)
