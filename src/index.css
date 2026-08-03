@@ -75,7 +75,8 @@
     scrollbar-color: var(--water-600) var(--water-800);
   }
 
-  /* Hairline graticule — subtle chart grid on the page body */
+  /* impeccable-disable codex-grid-background — this surface IS a nautical chart;
+     the graticule is the chartplotter direction's core visual, not decoration */
   body {
     background-image:
       linear-gradient(oklch(22% 0.03 230 / 0.35) 1px, transparent 1px),

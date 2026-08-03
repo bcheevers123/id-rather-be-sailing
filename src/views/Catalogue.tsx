@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useRef, useEffect } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../hooks/useData'
 import { buildSearchIndex, searchCourses } from '../lib/search'
@@ -52,27 +52,10 @@ function AccordionSection({
   isOpen: boolean
   onToggle: () => void
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = bodyRef.current
-    if (!el) return
-    if (isOpen) {
-      el.style.height = el.scrollHeight + 'px'
-      const t = setTimeout(() => { el.style.height = 'auto' }, 200)
-      return () => clearTimeout(t)
-    } else {
-      el.style.height = el.scrollHeight + 'px'
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { el.style.height = '0' })
-      })
-    }
-  }, [isOpen])
-
   return (
     <div style={{
       border: '1px solid var(--border)',
-      borderRadius: '8px',
+      borderRadius: '4px',
       overflow: 'hidden',
       background: 'var(--surface)',
     }}>
@@ -84,7 +67,7 @@ function AccordionSection({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0.75rem 1rem',
+          padding: '0.625rem 1rem',
           background: isOpen ? 'var(--surface-2)' : 'var(--surface)',
           textAlign: 'left',
           cursor: 'pointer',
@@ -92,31 +75,37 @@ function AccordionSection({
           transition: 'background 120ms',
           gap: '0.5rem',
         }}
-        className="hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-inset"
+        className="hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset"
       >
-        <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--ink)' }}>
           {CATEGORY_LABELS[cat]}
         </span>
         <div className="flex items-center gap-2 shrink-0">
           <span style={{
-            fontSize: '0.75rem',
-            fontWeight: 500,
-            color: 'var(--ink-muted)',
+            fontFamily: 'var(--font-data)',
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            color: 'var(--ink-faint)',
             background: 'var(--surface-3)',
-            borderRadius: '999px',
-            padding: '0.1rem 0.55rem',
+            borderRadius: '3px',
+            padding: '0.1rem 0.45rem',
+            letterSpacing: '0.02em',
           }}>
             {courses.length}
           </span>
           <ChevronIcon open={isOpen} />
         </div>
       </button>
-      <div
-        ref={bodyRef}
-        style={{ height: 0, overflow: 'hidden', transition: 'height 180ms cubic-bezier(0.4,0,0.2,1)' }}
-      >
-        <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {courses.map(course => <CourseCard key={course.id} course={course} />)}
+      {/* grid-template-rows animation: no height measurement, no layout thrash */}
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: isOpen ? '1fr' : '0fr',
+        transition: 'grid-template-rows 180ms cubic-bezier(0.4,0,0.2,1)',
+      }}>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ borderTop: '1px solid var(--border)', padding: '0.625rem', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            {courses.map(course => <CourseCard key={course.id} course={course} />)}
+          </div>
         </div>
       </div>
     </div>
