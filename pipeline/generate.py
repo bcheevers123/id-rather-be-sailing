@@ -15,7 +15,18 @@ import requests
 
 from pipeline.adapters.arlo import ArloAdapter
 from pipeline.adapters.blackpool import BlackpoolAdapter
+from pipeline.adapters.chieftain import ChieftainAdapter
+from pipeline.adapters.falmouth import FalmouthAdapter
+from pipeline.adapters.flying_fish import FlyingFishAdapter
+from pipeline.adapters.hota import HotaAdapter
+from pipeline.adapters.petans import PetansAdapter
+from pipeline.adapters.relyon import RelyOnAdapter
+from pipeline.adapters.seafood_cornwall import SeafoodCornwallAdapter
+from pipeline.adapters.seascope import SeascopeAdapter
+from pipeline.adapters.seahaven import SeahavenAdapter
 from pipeline.adapters.solent import SolentAdapter
+from pipeline.adapters.stcw_training_uk import StcwTrainingUkAdapter
+from pipeline.adapters.three_t import ThreeTAdapter
 from pipeline.adapters.uksa import UKSAAdapter, COURSE_URLS as UKSA_COURSE_URLS
 from pipeline.adapters.stream_marine import StreamMarineAdapter
 from pipeline.adapters.you_and_sea import YouAndSeaAdapter
@@ -350,6 +361,128 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
             logger.warning("You and Sea provider not found in providers_by_id")
             continue
         adapter = YouAndSeaAdapter(course_id, source_url)
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Falmouth Training Solutions
+    for course_id in ("pst", "fpff", "efa", "pssr"):
+        provider = providers_by_id.get("falmouth-training-solutions")
+        if not provider:
+            logger.warning("Falmouth provider not found")
+            break
+        adapter = FalmouthAdapter(course_id)
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Seahaven Maritime Academy
+    provider = providers_by_id.get("seahaven-maritime-academy")
+    if not provider:
+        logger.warning("Seahaven provider not found")
+    else:
+        adapter = SeahavenAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # HOTA
+    provider = providers_by_id.get("humberside-offshore-training-association-ltd")
+    if not provider:
+        logger.warning("HOTA provider not found")
+    else:
+        adapter = HotaAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Petans
+    provider = providers_by_id.get("petans-limited")
+    if not provider:
+        logger.warning("Petans provider not found")
+    else:
+        adapter = PetansAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Seascope Maritime Training
+    provider = providers_by_id.get("seascope-maritime-training")
+    if not provider:
+        logger.warning("Seascope provider not found")
+    else:
+        adapter = SeascopeAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Seafood Cornwall
+    provider = providers_by_id.get("seafood-cornwall-training-ltd")
+    if not provider:
+        logger.warning("Seafood Cornwall provider not found")
+    else:
+        adapter = SeafoodCornwallAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Flying Fish (Playwright — gracefully returns [] if Playwright not installed)
+    provider = providers_by_id.get("flying-fish-uk-ltd")
+    if not provider:
+        logger.warning("Flying Fish provider not found")
+    else:
+        adapter = FlyingFishAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # Chieftain Training (Playwright)
+    provider = providers_by_id.get("chieftain-training")
+    if not provider:
+        logger.warning("Chieftain provider not found")
+    else:
+        adapter = ChieftainAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # RelyOn Nutec (Playwright — emits offerings for multiple provider_ids)
+    provider = providers_by_id.get("relyon-nutec-aberdeen")
+    if not provider:
+        logger.warning("RelyOn provider not found")
+    else:
+        adapter = RelyOnAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # STCW Training UK (Playwright)
+    provider = providers_by_id.get("stcw-training-uk-ltd")
+    if not provider:
+        logger.warning("STCW Training UK provider not found")
+    else:
+        adapter = StcwTrainingUkAdapter()
+        raw_offerings = adapter.fetch(provider)
+        for o in raw_offerings:
+            o.freshness_status = compute_freshness(o.last_verified, now_iso)
+            offerings.append(o.to_dict())
+
+    # 3T Global (Playwright)
+    provider = providers_by_id.get("3t-training-services-limited")
+    if not provider:
+        logger.warning("3T provider not found")
+    else:
+        adapter = ThreeTAdapter()
         raw_offerings = adapter.fetch(provider)
         for o in raw_offerings:
             o.freshness_status = compute_freshness(o.last_verified, now_iso)
