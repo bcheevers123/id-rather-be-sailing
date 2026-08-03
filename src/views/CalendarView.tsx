@@ -11,7 +11,7 @@ import type { CalEvent } from '../lib/calendarEvents'
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek: () => startOfWeek(new Date(), { locale: enGB }),
+  startOfWeek: (date: Date) => startOfWeek(date, { locale: enGB }),
   getDay,
   locales: { 'en-GB': enGB },
 })
@@ -49,7 +49,7 @@ export function CalendarView() {
   }, [])
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading calendar…</div>
-  if (error) return <div className="p-8 text-center text-red-600">{error}</div>
+  if (error) return <div role="alert" className="p-8 text-center text-red-600">{error}</div>
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -59,7 +59,7 @@ export function CalendarView() {
         Click an event to go to the booking page.
       </p>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" style={{ height: 600 }}>
+      <div aria-label="Course calendar" className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" style={{ height: 600 }}>
         <Calendar
           localizer={localizer}
           events={events}
