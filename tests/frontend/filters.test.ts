@@ -67,4 +67,40 @@ describe('sortProviderResults', () => {
     const sorted = sortProviderResults(results, 'earliest_date')
     expect(sorted[0].provider.id).toBe('msa-dover')
   })
+
+  it('sorts by lowest price ascending', () => {
+    const p2: Provider = { ...provider, id: 'other', official_name: 'Expensive Academy' }
+    const a2: Approval = { ...approval, provider_id: 'other' }
+    const o2: Offering = { ...offering, id: 'pst-other-2026-08-10', provider_id: 'other', price: 500 }
+    const results = filterProviders([provider, p2], [approval, a2], [offering, o2], 'pst', {})
+    const sorted = sortProviderResults(results, 'lowest_price')
+    expect(sorted[0].provider.id).toBe('other')
+  })
+
+  it('sorts by provider name alphabetically', () => {
+    const p2: Provider = { ...provider, id: 'other', official_name: 'Alpha Academy' }
+    const a2: Approval = { ...approval, provider_id: 'other' }
+    const o2: Offering = { ...offering, id: 'pst-other-2026-08-10', provider_id: 'other' }
+    const results = filterProviders([provider, p2], [approval, a2], [offering, o2], 'pst', {})
+    const sorted = sortProviderResults(results, 'provider_name')
+    expect(sorted[0].provider.id).toBe('other')
+  })
+
+  it('sorts by recently verified (best freshness status first)', () => {
+    const p2: Provider = { ...provider, id: 'other' }
+    const a2: Approval = { ...approval, provider_id: 'other' }
+    const o2: Offering = { ...offering, id: 'pst-other-2026-08-10', provider_id: 'other', freshness_status: 'stale' }
+    const results = filterProviders([provider, p2], [approval, a2], [offering, o2], 'pst', {})
+    const sorted = sortProviderResults(results, 'recently_verified')
+    expect(sorted[0].provider.id).toBe('msa-dover')
+  })
+
+  it('sorts by location (city name alphabetically)', () => {
+    const p2: Provider = { ...provider, id: 'other', city: 'Aberdeen' }
+    const a2: Approval = { ...approval, provider_id: 'other' }
+    const o2: Offering = { ...offering, id: 'pst-other-2026-08-10', provider_id: 'other' }
+    const results = filterProviders([provider, p2], [approval, a2], [offering, o2], 'pst', {})
+    const sorted = sortProviderResults(results, 'location')
+    expect(sorted[0].provider.id).toBe('other')
+  })
 })

@@ -81,9 +81,11 @@ export function sortProviderResults(results: ProviderResult[], sortBy: SortField
     case 'recently_verified': {
       const statusOrder: Record<string, number> = { verified: 0, recently_checked: 1, stale: 2, source_unavailable: 3, no_public_schedule: 4 }
       return sorted.sort((a, b) => {
-        const aStatus = a.offerings[0]?.freshness_status ?? 'no_public_schedule'
-        const bStatus = b.offerings[0]?.freshness_status ?? 'no_public_schedule'
-        return (statusOrder[aStatus] ?? 5) - (statusOrder[bStatus] ?? 5)
+        const bestStatus = (result: ProviderResult) =>
+          result.offerings.length === 0
+            ? 4
+            : Math.min(...result.offerings.map(o => statusOrder[o.freshness_status] ?? 5))
+        return bestStatus(a) - bestStatus(b)
       })
     }
     case 'location':
