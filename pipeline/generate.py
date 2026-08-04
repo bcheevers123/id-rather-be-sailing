@@ -420,41 +420,48 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
                 o.freshness_status = compute_freshness(o.last_verified, now_iso)
                 offerings.append(o.to_dict())
 
-    # You and Sea adapter — one adapter call per (course_id, provider_id) approval pair.
-    # Each of the 10 approved courses has a distinct provider_id; we derive the mapping
-    # from the approvals list rather than hardcoding it.
-    for approval in approvals:
-        course_id = approval["course_id"]
-        pid = approval["provider_id"]
-        if course_id not in YOU_AND_SEA_COURSE_IDS:
-            continue
-        provider = providers_by_id.get(pid)
-        if not provider:
-            logger.warning("You and Sea provider not found in providers_by_id: %s", pid)
-            continue
-        adapter = YouAndSeaAdapter(course_id, YOU_AND_SEA_CALENDAR_URL)
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # You and Sea — one fetch per course_id (the calendar covers all courses).
+    # Multiple provider IDs share the same website; only call once per course.
+    _you_and_sea_done: set[str] = set()
+    you_and_sea_provider = next(
+        (p for p in providers_by_id.values() if "youandsea.com" in (p.get("website") or "")),
+        None,
+    )
+    if you_and_sea_provider:
+        for course_id in YOU_AND_SEA_COURSE_IDS:
+            if course_id in _you_and_sea_done:
+                continue
+            adapter = YouAndSeaAdapter(course_id, YOU_AND_SEA_CALENDAR_URL)
+            raw_offerings = adapter.fetch(you_and_sea_provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+            _you_and_sea_done.add(course_id)
 
-    # Falmouth Training Solutions — each MCA approval has its own provider_id
+    # Falmouth Training Solutions — after provider dedup all approvals share one provider ID.
+    # Use domain lookup so it still works if the slug changes.
+    falmouth_ts_provider = next(
+        (p for p in providers_by_id.values() if "falmouthtrainingsolutions.co.uk" in (p.get("website") or "")),
+        providers_by_id.get("falmouth-training-solutions"),
+    )
+    falmouth_ms_provider = next(
+        (p for p in providers_by_id.values() if "falmouthmarineschool" in (p.get("website") or "")),
+        providers_by_id.get("falmouth-marine-school"),
+    )
     FALMOUTH_COURSE_PROVIDERS = {
-        "pst":               "falmouth-training-solutions",
-        "fpff":              "falmouth-training-solutions-2",
-        "pssr":              "falmouth-training-solutions-3",
-        "helm-o":            "falmouth-training-solutions-4",
-        "security-awareness": "falmouth-training-solutions-5",
-        "dsd":               "falmouth-training-solutions-6",
-        "aec1":              "falmouth-training-solutions-7",
-        "aec2":              "falmouth-marine-school",
-        "workboat-nav-radar": "falmouth-training-solutions-8",
-        "workboat-stability": "falmouth-training-solutions-9",
+        "pst": falmouth_ts_provider,
+        "fpff": falmouth_ts_provider,
+        "pssr": falmouth_ts_provider,
+        "helm-o": falmouth_ts_provider,
+        "security-awareness": falmouth_ts_provider,
+        "dsd": falmouth_ts_provider,
+        "aec1": falmouth_ts_provider,
+        "aec2": falmouth_ms_provider,
+        "workboat-nav-radar": falmouth_ts_provider,
+        "workboat-stability": falmouth_ts_provider,
     }
-    for course_id, pid in FALMOUTH_COURSE_PROVIDERS.items():
-        provider = providers_by_id.get(pid)
+    for course_id, provider in FALMOUTH_COURSE_PROVIDERS.items():
         if not provider:
-            logger.warning("Falmouth provider not found: %s", pid)
             continue
         adapter = FalmouthAdapter(course_id)
         raw_offerings = adapter.fetch(provider)

@@ -1,6 +1,11 @@
 name: Refresh data
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/**'
+      - 'requirements.txt'
   schedule:
     - cron: '0 6 * * *'   # 06:00 UTC daily
   workflow_dispatch:        # Allow manual trigger from Actions tab
@@ -22,6 +27,7 @@ jobs:
           cache: pip
 
       - run: pip install -r requirements.txt
+      - run: python -m playwright install chromium --with-deps
 
       - name: Run data pipeline
         run: python -m pipeline.generate
