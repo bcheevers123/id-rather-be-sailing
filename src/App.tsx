@@ -3,6 +3,7 @@ import { Catalogue } from './views/Catalogue'
 import { CourseResults } from './views/CourseResults'
 import { CalendarView } from './views/CalendarView'
 import { PathwaysView } from './views/PathwaysView'
+import { OtherProviders } from './views/OtherProviders'
 import { ChartVesselsBackground } from './components/ChartVessels'
 import { RefreshCountdown } from './components/RefreshCountdown'
 
@@ -49,6 +50,7 @@ export default function App() {
               { to: '/', label: 'Courses', exact: true },
               { to: '/calendar', label: 'Calendar', exact: false },
               { to: '/pathways', label: 'Pathways', exact: false },
+              { to: '/other-providers', label: 'Other Providers', exact: false },
             ].map(({ to, label, exact }) => (
               <NavLink
                 key={to}
@@ -76,6 +78,7 @@ export default function App() {
           <Route path="/course/:id" element={<CourseResults />} />
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/pathways" element={<PathwaysView />} />
+          <Route path="/other-providers" element={<OtherProviders />} />
         </Routes>
       </main>
       <RefreshCountdown />

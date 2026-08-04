@@ -1,6 +1,26 @@
 import { Link } from 'react-router-dom'
 import type { Course } from '../types/data'
 
+function OtherProvidersLink() {
+  return (
+    <Link
+      to="/other-providers"
+      onClick={e => e.stopPropagation()}
+      style={{
+        fontFamily: 'var(--font-data)',
+        fontSize: '0.63rem',
+        color: 'var(--soundings)',
+        textDecoration: 'none',
+        whiteSpace: 'nowrap',
+      }}
+      className="hover:underline"
+      aria-label="Browse other providers"
+    >
+      other providers →
+    </Link>
+  )
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   stcw_basic:       'STCW Basic',
   stcw_advanced:    'STCW Advanced',
@@ -91,13 +111,7 @@ export function CourseCard({ course }: Props) {
             {course.earliest_known_date}
           </span>
         ) : (
-          <span style={{
-            fontFamily: 'var(--font-data)',
-            fontSize: '0.68rem',
-            color: 'var(--ink-faint)',
-          }}>
-            no dates
-          </span>
+          <OtherProvidersLink />
         )}
         {course.lowest_known_price_gbp !== null && (
           <span style={{

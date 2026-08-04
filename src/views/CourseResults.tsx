@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { useParams, useSearchParams, Link } from 'react-router-dom'
+import { useParams, useSearchParams, Link, NavLink } from 'react-router-dom'
 import { useData } from '../hooks/useData'
 import { filterProviders, sortProviderResults } from '../lib/filters'
 import { decodeFilters, encodeFilters } from '../lib/urls'
@@ -133,6 +133,27 @@ export function CourseResults() {
 
       <DisambiguationBanner note={course.confusion_note} />
 
+      {!course.earliest_known_date && (
+        <div style={{
+          background: 'var(--paper-sea)',
+          border: '1px solid var(--border)',
+          borderLeft: '3px solid var(--soundings)',
+          borderRadius: '2px',
+          padding: '0.75rem 1rem',
+          marginBottom: '1.25rem',
+          fontSize: '0.8125rem',
+          color: 'var(--ink-muted)',
+          lineHeight: 1.6,
+        }}>
+          We don't yet have live dates from any of these centres — their sites aren't yet connected to our
+          nightly data pull. You can browse and contact them directly in our{' '}
+          <NavLink to="/other-providers" style={{ color: 'var(--soundings)' }} className="hover:underline">
+            Other Providers
+          </NavLink>
+          {' '}list.
+        </div>
+      )}
+
       <div className="flex gap-6 flex-col md:flex-row">
         <aside className="md:w-48 flex-shrink-0">
           <FilterPanel filters={filters} onChange={setFilters} availableCountries={availableCountries} />
@@ -149,13 +170,19 @@ export function CourseResults() {
               background: 'var(--surface)',
               border: '1px solid var(--border)',
               borderRadius: '4px',
-              padding: '2rem',
+              padding: '1.5rem',
               textAlign: 'center',
-              color: 'var(--ink-faint)',
-              fontSize: '0.875rem',
-              fontFamily: 'var(--font-data)',
             }}>
-              No providers match the current filters.
+              <p style={{ color: 'var(--ink-faint)', fontSize: '0.875rem', fontFamily: 'var(--font-data)', marginBottom: '0.75rem' }}>
+                No providers match the current filters.
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', lineHeight: 1.6, maxWidth: '48ch', margin: '0 auto 0.875rem' }}>
+                Many approved centres don't publish schedules online. You may find one near you in our{' '}
+                <NavLink to="/other-providers" style={{ color: 'var(--soundings)' }} className="hover:underline">
+                  Other Providers
+                </NavLink>
+                {' '}list — all MCA-approved, contact details included.
+              </p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
