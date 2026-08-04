@@ -28,8 +28,70 @@ from pipeline.adapters.solent import SolentAdapter
 from pipeline.adapters.stcw_training_uk import StcwTrainingUkAdapter
 from pipeline.adapters.three_t import ThreeTAdapter
 from pipeline.adapters.uksa import UKSAAdapter, COURSE_URLS as UKSA_COURSE_URLS
+from pipeline.adapters.south_shields import SouthShieldsAdapter
+from pipeline.adapters.bluewater import BluewaterAdapter
+from pipeline.adapters.pyt_za import PytZaAdapter
+from pipeline.adapters.north_kent import NorthKentAdapter
+from pipeline.adapters.nafc import NafcAdapter
+from pipeline.adapters.yacht_crew_training import YachtCrewTrainingAdapter
+from pipeline.adapters.mpt_usa import MptUsaAdapter
+from pipeline.adapters.utt import UttAdapter
+from pipeline.adapters.east_coast_college import EastCoastCollegeAdapter
+from pipeline.adapters.pyt_usa import PytUsaAdapter
+from pipeline.adapters.sailing_gi import SailingGiAdapter
+from pipeline.adapters.sw_maritime import SwMaritimeAdapter
+from pipeline.adapters.glasgow_college import GlasgowCollegeAdapter
+from pipeline.adapters.himt import HimtAdapter
+from pipeline.adapters.searegs import SearegsAdapter
+from pipeline.adapters.bp_marine import BpMarineAdapter
+from pipeline.adapters.galileo import GalileoAdapter
+from pipeline.adapters.smaritime import SmaritimeAdapter
+from pipeline.adapters.seamanship_ie import SeamanshipIeAdapter
+from pipeline.adapters.fire_aid import FireAidAdapter
+from pipeline.adapters.mitags import MitagsAdapter
+from pipeline.adapters.uhi_nwh import UhiNwhAdapter
+from pipeline.adapters.hss import HssAdapter
 from pipeline.adapters.stream_marine import StreamMarineAdapter
 from pipeline.adapters.you_and_sea import YouAndSeaAdapter
+from pipeline.adapters.hitby_fishing import HitbyFishingAdapter
+from pipeline.adapters.north_kent_college import NorthKentCollegeAdapter
+from pipeline.adapters.idess import IdessAdapter
+from pipeline.adapters.maritime_training_in import MaritimeTrainingInAdapter
+from pipeline.adapters.city_of_glasgow import CityOfGlasgowAdapter
+from pipeline.adapters.ondeck import OndeckAdapter
+from pipeline.adapters.serco_marine import SercoMarineAdapter
+from pipeline.adapters.lagan_marine import LaganMarineAdapter
+from pipeline.adapters.medaire import MedAireAdapter
+from pipeline.adapters.nmci import NmciAdapter
+from pipeline.adapters.palma_sea import PalmaSeaAdapter
+from pipeline.adapters.estern import EsternAdapter
+from pipeline.adapters.hamble import HambleAdapter
+from pipeline.adapters.ddrc import DDRCAdapter
+from pipeline.adapters.ssm_hr import SsmHrAdapter
+from pipeline.adapters.stc import StcAdapter
+from pipeline.adapters.resolve_academy import ResolveAcademyAdapter
+from pipeline.adapters.nma_sa import NmaSaAdapter
+from pipeline.adapters.gibraltar_maritime import GibraltarMaritimeAdapter
+from pipeline.adapters.ocean_tg import OceanTgAdapter
+from pipeline.adapters.orkney_uhi import OrkneyUhiAdapter
+from pipeline.adapters.rnli import RnliAdapter
+from pipeline.adapters.defelice import DefeliceAdapter
+from pipeline.adapters.hlscc import HlsccAdapter
+from pipeline.adapters.ipowerboat import IpowerboatAdapter
+from pipeline.adapters.cernetmrcc import CernetmrccAdapter
+from pipeline.adapters.marine_radio import MarineRadioAdapter
+from pipeline.adapters.evergreen_marine import EvergreenMarineAdapter
+from pipeline.adapters.securewest import SecurewestAdapter
+from pipeline.adapters.falmouth_marine_school import FalmouthMarineSchoolAdapter
+from pipeline.adapters.lr import LrAdapter
+from pipeline.adapters.cae import CaeAdapter
+from pipeline.adapters.wavetrain import WavetrainAdapter
+from pipeline.adapters.abb_marine import AbbMarineAdapter
+from pipeline.adapters.faraday_centre import FaradayCentreAdapter
+from pipeline.adapters.aset import AsetAdapter
+from pipeline.adapters.seefunkschule import SeefunkschuleAdapter
+from pipeline.adapters.namtc import NamtcAdapter
+from pipeline.geocode import geocode_providers
 from pipeline.change_detector import detect_changes
 from pipeline.freshness import compute_freshness
 from pipeline.mca_source import PdfLink, download_mca_page, fetch_pdf_links
@@ -46,19 +108,22 @@ USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.co
 DEFAULT_OUTPUT_DIR = Path(__file__).parent.parent / "public" / "data"
 
 ARLO_ADAPTERS: dict[str, list[dict]] = {
+    # Each entry uses "domain" to match all providers sharing that website.
+    # The loop below iterates every provider whose website contains that domain.
     "pst": [
-        {"subdomain": "maritimeskillsacademy", "course_path": "/courses/stcw-basic-safety-training", "provider_id": "maritime-skills-academy-dover-part-of-viking-maritime-group"},
+        {"subdomain": "maritimeskillsacademy", "course_path": "/courses/stcw-basic-safety-training", "domain": "maritimeskillsacademy.com"},
     ],
 }
 
 # You and Sea Ltd — calendar page is Squarespace JS-rendered; adapter returns []
-# unless SSR event markup becomes available
-YOU_AND_SEA_ADAPTERS: dict[str, str] = {
-    "pst": "https://youandsea.com/course-calendar",
-    "fpff": "https://youandsea.com/course-calendar",
-    "efa": "https://youandsea.com/course-calendar",
-    "pssr": "https://youandsea.com/course-calendar",
+# unless SSR event markup becomes available.
+# All 10 approved courses share the same calendar URL; each has a distinct provider_id
+# (you-and-sea-ltd through you-and-sea-ltd-10) per the MCA approvals data.
+YOU_AND_SEA_COURSE_IDS: set[str] = {
+    "pst", "efa", "pssr", "mfa", "mc", "upst", "helm-o", "ecdis",
+    "workboat-nav-radar", "workboat-stability",
 }
+YOU_AND_SEA_CALENDAR_URL = "https://youandsea.com/course-calendar"
 
 # Stream Marine uses Arlo-hosted event pages for each course
 STREAM_MARINE_ADAPTERS: dict[str, str] = {
@@ -291,202 +356,742 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
     approvals = deduped_approvals
 
     valid_courses = validate_all("course", courses)
-    valid_providers = validate_all("provider", list(providers_by_id.values()))
+    raw_providers = list(providers_by_id.values())
+    geocode_providers(raw_providers)
+    valid_providers = validate_all("provider", raw_providers)
     valid_approvals = validate_all("approval", approvals)
 
     offerings: list[dict] = []
     now_iso = datetime.now(timezone.utc).isoformat()
 
+    # Arlo adapter — loops all providers whose website matches the configured domain
     for course_id, adapter_configs in ARLO_ADAPTERS.items():
         for cfg in adapter_configs:
-            provider = providers_by_id.get(cfg["provider_id"])
-            if not provider:
-                continue
             adapter = ArloAdapter(cfg["subdomain"], cfg["course_path"], course_id)
-            raw_offerings = adapter.fetch(provider)
+            for pid, provider in providers_by_id.items():
+                if cfg["domain"] in (provider.get("website") or ""):
+                    raw_offerings = adapter.fetch(provider)
+                    for o in raw_offerings:
+                        o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                        offerings.append(o.to_dict())
+
+    # UKSA adapter — loops all 14 uksa.org providers, one UKSAAdapter per course
+    for course_id in UKSA_COURSE_URLS:
+        uksa_adapter = UKSAAdapter(course_id)
+        for pid, provider in providers_by_id.items():
+            if "uksa.org" in (provider.get("website") or ""):
+                raw_offerings = uksa_adapter.fetch(provider)
+                for o in raw_offerings:
+                    o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                    offerings.append(o.to_dict())
+
+    # Stream Marine adapter — loops all streammarinetraining.com providers
+    for course_id, source_url in STREAM_MARINE_ADAPTERS.items():
+        stream_adapter = StreamMarineAdapter(course_id, source_url)
+        for pid, provider in providers_by_id.items():
+            if "streammarinetraining.com" in (provider.get("website") or ""):
+                raw_offerings = stream_adapter.fetch(provider)
+                for o in raw_offerings:
+                    o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                    offerings.append(o.to_dict())
+
+    # Solent / Warsash adapter — loops all 46 maritime.solent.ac.uk providers (API caches internally)
+    solent_adapter = SolentAdapter()
+    for pid, provider in providers_by_id.items():
+        if "maritime.solent.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = solent_adapter.fetch(provider)
             for o in raw_offerings:
                 o.freshness_status = compute_freshness(o.last_verified, now_iso)
                 offerings.append(o.to_dict())
 
-    # UKSA adapter
-    for course_id in UKSA_COURSE_URLS:
-        provider = providers_by_id.get("united-kingdom-sailing-academy-uksa")
-        if not provider:
-            logger.warning("UKSA provider not found in providers_by_id")
-            continue
-        adapter = UKSAAdapter(course_id)
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
-
-    # Stream Marine adapter
-    for course_id, source_url in STREAM_MARINE_ADAPTERS.items():
-        provider = providers_by_id.get("stream-marine-training")
-        if not provider:
-            logger.warning("Stream Marine provider not found in providers_by_id")
-            continue
-        adapter = StreamMarineAdapter(course_id, source_url)
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
-
-    # Solent / Warsash adapter
-    solent_provider = providers_by_id.get("warsash-maritime-school-solent-university-southampton")
-    if not solent_provider:
-        logger.warning("Solent provider not found in providers_by_id")
-    else:
-        adapter = SolentAdapter()
-        raw_offerings = adapter.fetch(solent_provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
-
     # Blackpool and The Fylde College adapter
-    blackpool_provider = providers_by_id.get("blackpool-and-the-fylde-college")
-    if not blackpool_provider:
-        logger.warning("Blackpool provider not found in providers_by_id")
-    else:
-        adapter = BlackpoolAdapter()
-        raw_offerings = adapter.fetch(blackpool_provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    blackpool_adapter = BlackpoolAdapter()
+    for pid, provider in providers_by_id.items():
+        if "fleetwoodnautical.blackpool.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = blackpool_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # You and Sea adapter
-    for course_id, source_url in YOU_AND_SEA_ADAPTERS.items():
-        provider = providers_by_id.get("you-and-sea-ltd")
-        if not provider:
-            logger.warning("You and Sea provider not found in providers_by_id")
+    # You and Sea adapter — one adapter call per (course_id, provider_id) approval pair.
+    # Each of the 10 approved courses has a distinct provider_id; we derive the mapping
+    # from the approvals list rather than hardcoding it.
+    for approval in approvals:
+        course_id = approval["course_id"]
+        pid = approval["provider_id"]
+        if course_id not in YOU_AND_SEA_COURSE_IDS:
             continue
-        adapter = YouAndSeaAdapter(course_id, source_url)
+        provider = providers_by_id.get(pid)
+        if not provider:
+            logger.warning("You and Sea provider not found in providers_by_id: %s", pid)
+            continue
+        adapter = YouAndSeaAdapter(course_id, YOU_AND_SEA_CALENDAR_URL)
         raw_offerings = adapter.fetch(provider)
         for o in raw_offerings:
             o.freshness_status = compute_freshness(o.last_verified, now_iso)
             offerings.append(o.to_dict())
 
-    # Falmouth Training Solutions
-    for course_id in ("pst", "fpff", "efa", "pssr"):
-        provider = providers_by_id.get("falmouth-training-solutions")
+    # Falmouth Training Solutions — each MCA approval has its own provider_id
+    FALMOUTH_COURSE_PROVIDERS = {
+        "pst":               "falmouth-training-solutions",
+        "fpff":              "falmouth-training-solutions-2",
+        "pssr":              "falmouth-training-solutions-3",
+        "helm-o":            "falmouth-training-solutions-4",
+        "security-awareness": "falmouth-training-solutions-5",
+        "dsd":               "falmouth-training-solutions-6",
+        "aec1":              "falmouth-training-solutions-7",
+        "aec2":              "falmouth-marine-school",
+        "workboat-nav-radar": "falmouth-training-solutions-8",
+        "workboat-stability": "falmouth-training-solutions-9",
+    }
+    for course_id, pid in FALMOUTH_COURSE_PROVIDERS.items():
+        provider = providers_by_id.get(pid)
         if not provider:
-            logger.warning("Falmouth provider not found")
-            break
+            logger.warning("Falmouth provider not found: %s", pid)
+            continue
         adapter = FalmouthAdapter(course_id)
         raw_offerings = adapter.fetch(provider)
         for o in raw_offerings:
             o.freshness_status = compute_freshness(o.last_verified, now_iso)
             offerings.append(o.to_dict())
 
-    # Seahaven Maritime Academy
-    provider = providers_by_id.get("seahaven-maritime-academy")
-    if not provider:
-        logger.warning("Seahaven provider not found")
-    else:
-        adapter = SeahavenAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # Seahaven Maritime Academy (3 provider IDs all share one website)
+    seahaven_adapter = SeahavenAdapter()
+    for pid, provider in providers_by_id.items():
+        if "seahavenmaritimeacademy.co.uk" in (provider.get("website") or ""):
+            raw_offerings = seahaven_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # HOTA
-    provider = providers_by_id.get("humberside-offshore-training-association-ltd")
-    if not provider:
-        logger.warning("HOTA provider not found")
-    else:
-        adapter = HotaAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # HOTA (Humberside Offshore Training Association — up to 9 provider IDs, all share one website)
+    hota_adapter = HotaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "hota.org" in (provider.get("website") or ""):
+            raw_offerings = hota_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # Petans
-    provider = providers_by_id.get("petans-limited")
-    if not provider:
-        logger.warning("Petans provider not found")
-    else:
-        adapter = PetansAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # Petans (up to 5 provider IDs, all share one website)
+    petans_adapter = PetansAdapter()
+    for pid, provider in providers_by_id.items():
+        if "petans.co.uk" in (provider.get("website") or ""):
+            raw_offerings = petans_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # Seascope Maritime Training
-    provider = providers_by_id.get("seascope-maritime-training")
-    if not provider:
-        logger.warning("Seascope provider not found")
-    else:
-        adapter = SeascopeAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # Seascope Maritime Training (8 provider IDs, all share one website)
+    seascope_adapter = SeascopeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "seascopemaritimetraining.com" in (provider.get("website") or ""):
+            raw_offerings = seascope_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # Seafood Cornwall
-    provider = providers_by_id.get("seafood-cornwall-training-ltd")
-    if not provider:
-        logger.warning("Seafood Cornwall provider not found")
-    else:
-        adapter = SeafoodCornwallAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # Seafood Cornwall Training Ltd (8 provider IDs, all share one website)
+    seafood_adapter = SeafoodCornwallAdapter()
+    for pid, provider in providers_by_id.items():
+        if "seafoodcornwalltraining.co.uk" in (provider.get("website") or ""):
+            raw_offerings = seafood_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
     # Flying Fish (Playwright — gracefully returns [] if Playwright not installed)
-    provider = providers_by_id.get("flying-fish-uk-ltd")
-    if not provider:
-        logger.warning("Flying Fish provider not found")
-    else:
-        adapter = FlyingFishAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # All 6 flying-fish-uk-ltd-* providers share the same website; loop them all.
+    flying_fish_adapter = FlyingFishAdapter()
+    for pid, provider in providers_by_id.items():
+        if "flyingfishonline.com" in (provider.get("website") or ""):
+            raw_offerings = flying_fish_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # Chieftain Training (Playwright)
-    provider = providers_by_id.get("chieftain-training")
-    if not provider:
-        logger.warning("Chieftain provider not found")
-    else:
-        adapter = ChieftainAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # Chieftain Training (Playwright — 9 providers all share chieftain.training)
+    chieftain_adapter = ChieftainAdapter()
+    for pid, provider in providers_by_id.items():
+        if "chieftain.training" in (provider.get("website") or ""):
+            raw_offerings = chieftain_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # RelyOn Nutec (Playwright — emits offerings for multiple provider_ids)
-    provider = providers_by_id.get("relyon-nutec-aberdeen")
-    if not provider:
-        logger.warning("RelyOn provider not found")
-    else:
-        adapter = RelyOnAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # RelyOn Nutec (Playwright — scrapes all locations, emits provider_ids from site data)
+    # Use a domain loop but only call fetch() once (adapter ignores the provider arg and
+    # fetches the whole site); a sentinel flag prevents duplicate runs.
+    _relyon_done = False
+    relyon_adapter = RelyOnAdapter()
+    for pid, provider in providers_by_id.items():
+        if "relyonnutec.com" in (provider.get("website") or "") and not _relyon_done:
+            raw_offerings = relyon_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+            _relyon_done = True
 
-    # STCW Training UK (Playwright)
-    provider = providers_by_id.get("stcw-training-uk-ltd")
-    if not provider:
-        logger.warning("STCW Training UK provider not found")
-    else:
-        adapter = StcwTrainingUkAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # STCW Training UK (Playwright) — loop all providers sharing stcw-training-uk.com
+    stcw_uk_adapter = StcwTrainingUkAdapter()
+    for pid, provider in providers_by_id.items():
+        if "stcw-training-uk.com" in (provider.get("website") or ""):
+            raw_offerings = stcw_uk_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
-    # 3T Global (Playwright)
-    provider = providers_by_id.get("3t-training-services-limited")
-    if not provider:
-        logger.warning("3T provider not found")
-    else:
-        adapter = ThreeTAdapter()
-        raw_offerings = adapter.fetch(provider)
-        for o in raw_offerings:
-            o.freshness_status = compute_freshness(o.last_verified, now_iso)
-            offerings.append(o.to_dict())
+    # 3T Global (Playwright) — loop all 9 provider records sharing 3tglobal.com
+    three_t_adapter = ThreeTAdapter()
+    for pid, provider in providers_by_id.items():
+        if "3tglobal.com" in (provider.get("website") or ""):
+            raw_offerings = three_t_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # South Shields Marine School (EBSonTrack system, 22 providers sharing one booking system)
+    south_shields_adapter = SouthShieldsAdapter()
+    for pid, provider in providers_by_id.items():
+        if "southshieldsmarineschool.com" in (provider.get("website") or ""):
+            raw_offerings = south_shields_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Bluewater Yachting (38 providers across Spain/France/Italy)
+    bluewater_adapter = BluewaterAdapter()
+    for pid, provider in providers_by_id.items():
+        if "bluewateryachting.com" in (provider.get("website") or ""):
+            raw_offerings = bluewater_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # PYT South Africa (23 providers — all share one calendar)
+    pyt_za_adapter = PytZaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "pyt.co.za" in (provider.get("website") or ""):
+            raw_offerings = pyt_za_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # North Kent College / NMTC Training (12 providers, real data on nmtctraining.co.uk)
+    north_kent_adapter = NorthKentAdapter()
+    for pid, provider in providers_by_id.items():
+        if "northkent.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = north_kent_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # NAFC / Shetland UHI (11 providers)
+    nafc_adapter = NafcAdapter()
+    for pid, provider in providers_by_id.items():
+        website = provider.get("website") or ""
+        if "nafc.ac.uk" in website or "shetland.uhi.ac.uk" in website:
+            raw_offerings = nafc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Yacht Crew Training / Seascope Antibes (Shopify, 11 providers)
+    yct_adapter = YachtCrewTrainingAdapter()
+    for pid, provider in providers_by_id.items():
+        if "yachtcrewtraining.com" in (provider.get("website") or ""):
+            raw_offerings = yct_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Maritime Professional Training USA (MPT, 12 providers)
+    mpt_usa_adapter = MptUsaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "mptusa.com" in (provider.get("website") or ""):
+            raw_offerings = mpt_usa_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # UTT Trinidad (12 providers)
+    utt_adapter = UttAdapter()
+    for pid, provider in providers_by_id.items():
+        if "utt.edu.tt" in (provider.get("website") or ""):
+            raw_offerings = utt_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # East Coast College / East Coast Training Academy (9 providers)
+    east_coast_adapter = EastCoastCollegeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "eastcoast.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = east_coast_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # PYT USA — Fort Lauderdale (11 providers, WordPress Events API)
+    pyt_usa_adapter = PytUsaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "professionalyachttraining.com" in (provider.get("website") or ""):
+            raw_offerings = pyt_usa_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Allabroad Maritime Academy — Gibraltar (9 providers, WordPress static HTML)
+    sailing_gi_adapter = SailingGiAdapter()
+    for pid, provider in providers_by_id.items():
+        if "sailing.gi" in (provider.get("website") or ""):
+            raw_offerings = sailing_gi_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # South West Maritime Academy (8 providers, Arlo/WordPress)
+    sw_maritime_adapter = SwMaritimeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "southwestmaritimeacademy.com" in (provider.get("website") or ""):
+            raw_offerings = sw_maritime_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # City of Glasgow College (10 providers, WooCommerce/FooEvents subdomain)
+    glasgow_adapter = GlasgowCollegeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "cityofglasgowcollege.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = glasgow_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # HIMT India (10 providers, static HTML on himtmarine.com)
+    himt_adapter = HimtAdapter()
+    for pid, provider in providers_by_id.items():
+        if "himtoffshore.com" in (provider.get("website") or ""):
+            raw_offerings = himt_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Searegs Training Ltd (7 providers, Arlo ipowerboat subdomain)
+    searegs_adapter = SearegsAdapter()
+    for pid, provider in providers_by_id.items():
+        if "searegs" in (provider.get("website") or "").lower():
+            raw_offerings = searegs_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # BP Marine Academy India (9 providers, ASP.NET WebForms booking system)
+    bp_marine_adapter = BpMarineAdapter()
+    for pid, provider in providers_by_id.items():
+        if "bpmarine.in" in (provider.get("website") or ""):
+            raw_offerings = bp_marine_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Galileo Maritime Academy Thailand (8 providers, WordPress AJAX)
+    galileo_adapter = GalileoAdapter()
+    for pid, provider in providers_by_id.items():
+        if "galileomaritimeacademy.com" in (provider.get("website") or ""):
+            raw_offerings = galileo_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Scottish Maritime Academy / NE Scotland College (6 providers, nescol.ac.uk)
+    smaritime_adapter = SmaritimeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "smaritime.co.uk" in (provider.get("website") or ""):
+            raw_offerings = smaritime_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # The Seamanship Centre — Ireland (6 providers, Tribe Events REST API)
+    seamanship_ie_adapter = SeamanshipIeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "seamanship.ie" in (provider.get("website") or ""):
+            raw_offerings = seamanship_ie_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Fire Aid Academy Hythe (7 providers, bespoke .NET booking system)
+    fire_aid_adapter = FireAidAdapter()
+    for pid, provider in providers_by_id.items():
+        if "fireaid.com" in (provider.get("website") or ""):
+            raw_offerings = fire_aid_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # MITAGS USA (5 providers, static HTML course pages)
+    mitags_adapter = MitagsAdapter()
+    for pid, provider in providers_by_id.items():
+        if "mitags.org" in (provider.get("website") or ""):
+            raw_offerings = mitags_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # UHI North West and Hebrides (5 providers, Eventbrite API)
+    uhi_nwh_adapter = UhiNwhAdapter()
+    for pid, provider in providers_by_id.items():
+        if "nwh.uhi.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = uhi_nwh_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # HSS / John Percival Marine Associates (7 providers, static HTML)
+    hss_adapter = HssAdapter()
+    for pid, provider in providers_by_id.items():
+        if "hss.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = hss_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    north_kent_college_adapter = NorthKentCollegeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "northkent.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = north_kent_college_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    hitby_fishing_adapter = HitbyFishingAdapter()
+    for pid, provider in providers_by_id.items():
+        if "whitbyfishingschool.co.uk" in (provider.get("website") or "") or "54northmaritime.co.uk" in (provider.get("website") or ""):
+            raw_offerings = hitby_fishing_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    idess_adapter = IdessAdapter()
+    for pid, provider in providers_by_id.items():
+        if "idess.com.ph" in (provider.get("website") or "") or "idessmaritime.weebly.com" in (provider.get("website") or ""):
+            raw_offerings = idess_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    maritime_training_in_adapter = MaritimeTrainingInAdapter()
+    for pid, provider in providers_by_id.items():
+        if "maritimetraining.in" in (provider.get("website") or ""):
+            raw_offerings = maritime_training_in_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    city_of_glasgow_adapter = CityOfGlasgowAdapter()
+    for pid, provider in providers_by_id.items():
+        if "cityofglasgowcollege.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = city_of_glasgow_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Ondeck — requires Chrome profile with real browsing history to pass reCAPTCHA Enterprise;
+    # returns [] in headless CI but is wired so it auto-populates if run with ONDECK_CHROME_PROFILE set
+    ondeck_adapter = OndeckAdapter()
+    for pid, provider in providers_by_id.items():
+        if "ondecksailing.com" in (provider.get("website") or ""):
+            raw_offerings = ondeck_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Serco Marine — domain parked (Azure holding page); returns [] until site is live
+    serco_marine_adapter = SercoMarineAdapter()
+    for pid, provider in providers_by_id.items():
+        if "sercomarine.com" in (provider.get("website") or ""):
+            raw_offerings = serco_marine_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    lagan_marine_adapter = LaganMarineAdapter()
+    for pid, provider in providers_by_id.items():
+        if "laganmarine.co.uk" in (provider.get("website") or ""):
+            raw_offerings = lagan_marine_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    medaire_adapter = MedAireAdapter()
+    for pid, provider in providers_by_id.items():
+        if "medaire.com" in (provider.get("website") or ""):
+            raw_offerings = medaire_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    nmci_adapter = NmciAdapter()
+    for pid, provider in providers_by_id.items():
+        if "nmci.ie" in (provider.get("website") or ""):
+            raw_offerings = nmci_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    palma_sea_adapter = PalmaSeaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "palmaseaschool.com" in (provider.get("website") or ""):
+            raw_offerings = palma_sea_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Western Maritime Training — WAF-blocked (sgcaptcha), returns []
+    estern_adapter = EsternAdapter()
+    for pid, provider in providers_by_id.items():
+        if "westernmaritime" in (provider.get("website") or "").lower():
+            raw_offerings = estern_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Hamble School of Yachting (pst/efa/mfa/mc, booking-form select + prose dates)
+    hamble_adapter = HambleAdapter()
+    for pid, provider in providers_by_id.items():
+        if "hamble.co.uk" in (provider.get("website") or ""):
+            raw_offerings = hamble_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # DDRC Healthcare Plymouth (mfa/mc/efa, Arlo sessions, crawl-delay 10s)
+    ddrc_adapter = DDRCAdapter()
+    for pid, provider in providers_by_id.items():
+        if "ddrc.org" in (provider.get("website") or "") or "ddrc.co.uk" in (provider.get("website") or ""):
+            raw_offerings = ddrc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # SSM Split (Croatia) — WordPress my-calendar API; returns [] until schedule published
+    ssm_hr_adapter = SsmHrAdapter()
+    for pid, provider in providers_by_id.items():
+        if "ssm.hr" in (provider.get("website") or ""):
+            raw_offerings = ssm_hr_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # STC / South Tyneside College — marine brand redirects to South Shields, returns []
+    stc_adapter = StcAdapter()
+    for pid, provider in providers_by_id.items():
+        if "stc.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = stc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Resolve Maritime Academy (data-course JSON attributes, USD prices)
+    resolve_academy_adapter = ResolveAcademyAdapter()
+    for pid, provider in providers_by_id.items():
+        if "resolveacademy.com" in (provider.get("website") or ""):
+            raw_offerings = resolve_academy_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # NMA Saudi Arabia — no public schedule, returns []
+    nma_sa_adapter = NmaSaAdapter()
+    for pid, provider in providers_by_id.items():
+        if "nma.edu.sa" in (provider.get("website") or ""):
+            raw_offerings = nma_sa_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # University of Gibraltar / Gibraltar Maritime Academy (dates TBD on site)
+    gibraltar_maritime_adapter = GibraltarMaritimeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "unigib.edu.gi" in (provider.get("website") or ""):
+            raw_offerings = gibraltar_maritime_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Ocean TG / One Ocean — redirects to oneocean.com (e-learning only), returns []
+    ocean_tg_adapter = OceanTgAdapter()
+    for pid, provider in providers_by_id.items():
+        if "oceantg.com" in (provider.get("website") or ""):
+            raw_offerings = ocean_tg_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Orkney College UHI — no public STCW schedule, returns []
+    orkney_uhi_adapter = OrkneyUhiAdapter()
+    for pid, provider in providers_by_id.items():
+        if "orkney.uhi.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = orkney_uhi_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # RNLI — CDN/WAF blocks all automated access (403 on all paths), returns []
+    rnli_adapter = RnliAdapter()
+    for pid, provider in providers_by_id.items():
+        if "rnli.org" in (provider.get("website") or ""):
+            raw_offerings = rnli_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # De Felice Srl Italy — calendar "under construction", returns []
+    defelice_adapter = DefeliceAdapter()
+    for pid, provider in providers_by_id.items():
+        if "defelice.yachts" in (provider.get("website") or ""):
+            raw_offerings = defelice_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # HLSCC British Virgin Islands — no upcoming events published, returns []
+    hlscc_adapter = HlsccAdapter()
+    for pid, provider in providers_by_id.items():
+        if "hlscc.org" in (provider.get("website") or "") or "hlscc.edu.vg" in (provider.get("website") or ""):
+            raw_offerings = hlscc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Falmouth Marine School — 403 on all programmatic requests, returns []
+    falmouth_marine_school_adapter = FalmouthMarineSchoolAdapter()
+    for pid, provider in providers_by_id.items():
+        if "falmouthmarineschool.ac.uk" in (provider.get("website") or ""):
+            raw_offerings = falmouth_marine_school_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Lloyd's Register EMEA — SSO course, no public pricing
+    lr_adapter = LrAdapter()
+    for pid, provider in providers_by_id.items():
+        if "lr.org" in (provider.get("website") or ""):
+            raw_offerings = lr_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # CAE — aviation/defence simulation, no open STCW schedule, returns []
+    cae_adapter = CaeAdapter()
+    for pid, provider in providers_by_id.items():
+        if "cae.com" in (provider.get("website") or ""):
+            raw_offerings = cae_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Wavetrain — SSO/DSD static HTML, enquiry-only booking
+    wavetrain_adapter = WavetrainAdapter()
+    for pid, provider in providers_by_id.items():
+        if "wavetrain.co.uk" in (provider.get("website") or ""):
+            raw_offerings = wavetrain_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # ABB Marine Academy — JS SPA behind enterprise CDN, returns []
+    abb_marine_adapter = AbbMarineAdapter()
+    for pid, provider in providers_by_id.items():
+        if "abb.com" in (provider.get("website") or ""):
+            raw_offerings = abb_marine_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Faraday Centre — electrical safety only, no radio/GMDSS, returns []
+    faraday_centre_adapter = FaradayCentreAdapter()
+    for pid, provider in providers_by_id.items():
+        if "faradaycentre.co.uk" in (provider.get("website") or ""):
+            raw_offerings = faraday_centre_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # ASET International — GOC/ROC pages, no dates currently published, returns []
+    aset_adapter = AsetAdapter()
+    for pid, provider in providers_by_id.items():
+        if "aset.co.uk" in (provider.get("website") or ""):
+            raw_offerings = aset_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Seefunkschule Austria — static HTML schedule, ROC/LRC courses (German month names)
+    seefunkschule_adapter = SeefunkschuleAdapter()
+    for pid, provider in providers_by_id.items():
+        if "seefunkschule.at" in (provider.get("website") or ""):
+            raw_offerings = seefunkschule_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # NAMTC China — JS-only SaaS site, CMA courses don't map to STCW IDs, returns []
+    namtc_adapter = NamtcAdapter()
+    for pid, provider in providers_by_id.items():
+        if "namtc.com.cn" in (provider.get("website") or ""):
+            raw_offerings = namtc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Evergreen Marine Corp — container shipping company, no STCW training schedule, returns []
+    evergreen_marine_adapter = EvergreenMarineAdapter()
+    for pid, provider in providers_by_id.items():
+        if "evergreen-marine.com" in (provider.get("website") or ""):
+            raw_offerings = evergreen_marine_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Securewest — online self-paced only (no scheduled dates), returns []
+    securewest_adapter = SecurewestAdapter()
+    for pid, provider in providers_by_id.items():
+        if "securewest.com" in (provider.get("website") or ""):
+            raw_offerings = securewest_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # Marine Radio / RT Training — static HTML, GOC/LRC/ROC pages
+    marine_radio_adapter = MarineRadioAdapter()
+    for pid, provider in providers_by_id.items():
+        if "marineradio.co.uk" in (provider.get("website") or ""):
+            raw_offerings = marine_radio_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # CERNET MRCC Italy — GOC/ROC calendario page, 41 offerings
+    cernetmrcc_adapter = CernetmrccAdapter()
+    for pid, provider in providers_by_id.items():
+        if "cernetmrcc.com" in (provider.get("website") or ""):
+            raw_offerings = cernetmrcc_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
+
+    # iPowerboat Ltd — ipowerboat.co.uk redirects to searegs.co.uk, but providers.json
+    # records the original URL; the Arlo endpoint is shared with SearegsAdapter.
+    ipowerboat_adapter = IpowerboatAdapter()
+    for pid, provider in providers_by_id.items():
+        if "ipowerboat.co.uk" in (provider.get("website") or ""):
+            raw_offerings = ipowerboat_adapter.fetch(provider)
+            for o in raw_offerings:
+                o.freshness_status = compute_freshness(o.last_verified, now_iso)
+                offerings.append(o.to_dict())
 
     valid_offerings = validate_all("offering", offerings)
 

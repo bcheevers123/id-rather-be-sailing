@@ -1,7 +1,15 @@
 """RelyOn Nutec adapter.
 
-Scrapes https://shop.relyon.com/ — a JS-rendered booking platform — for
-STCW/MCA maritime course dates at UK locations.
+Scrapes https://shop.relyon.com/ for STCW/MCA maritime course dates at UK
+locations.  Uses two strategies:
+
+1. Discover STCW course URLs from the sitemap (no JS required).
+2. For each course page:
+   a. Render with Playwright and extract the JSON-LD ``hasCourseInstance``
+      array (first page, up to 10 rows).
+   b. If ``hdn_total_records > page_size``, fetch remaining pages via the
+      ``/Course/PagedCourseInstancesForDetails`` AJAX endpoint (JSON POST)
+      and parse the returned HTML fragment with BeautifulSoup.
 
 Location → provider_id mapping:
     Aberdeen  → relyon-nutec-aberdeen
@@ -9,23 +17,30 @@ Location → provider_id mapping:
     Liverpool → relyon-liverpool
     Teesside  → relyon-nutec-teesside
 
-Unknown locations fall back to ``relyon-nutec-aberdeen`` with the raw
-location name surfaced in the ``availability`` field.
+Unknown locations fall back to ``relyon-nutec-aberdeen``.
 """
+import json
 import logging
+import math
 import re
+import time
 from datetime import datetime, timezone
 
+import requests
 from bs4 import BeautifulSoup
 
 from pipeline.adapters.base import Offering
-from pipeline.adapters.playwright_base import PlaywrightAdapter
+from pipeline.adapters.playwright_base import USER_AGENT, PlaywrightAdapter
 from pipeline.normalise import safe_url
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://shop.relyon.com"
-SHOP_URL = BASE_URL + "/"
+SITEMAP_URL = BASE_URL + "/sitemap.xml"
+AJAX_URL = BASE_URL + "/Course/PagedCourseInstancesForDetails"
+
+# Minimum polite delay between requests (seconds)
+_REQUEST_DELAY = 2.0
 
 # ------------------------------------------------------------------
 # Location → provider_id mapping
@@ -34,7 +49,7 @@ _LOCATION_MAP: list[tuple[re.Pattern, str]] = [
     (re.compile(r"aberdeen", re.I), "relyon-nutec-aberdeen"),
     (re.compile(r"glasgow", re.I), "relyon-glasgow"),
     (re.compile(r"liverpool", re.I), "relyon-liverpool"),
-    (re.compile(r"teesside|tees", re.I), "relyon-nutec-teesside"),
+    (re.compile(r"teesside|tees|middlesbrough", re.I), "relyon-nutec-teesside"),
 ]
 
 _FALLBACK_PROVIDER_ID = "relyon-nutec-aberdeen"
@@ -45,65 +60,37 @@ _FALLBACK_PROVIDER_ID = "relyon-nutec-aberdeen"
 _COURSE_ID_MAP: list[tuple[re.Pattern, str]] = [
     (re.compile(r"personal.survival.techniques|[^a-z]pst[^a-z]", re.I), "pst"),
     (re.compile(r"elementary.first.aid|[^a-z]efa[^a-z]", re.I), "efa"),
-    (re.compile(r"fire.prevention|[^a-z]fpff[^a-z]", re.I), "fpff"),
-    (re.compile(r"personal.safety|[^a-z]pssr[^a-z]", re.I), "pssr"),
+    (re.compile(r"fire.prevention.and.fire.fighting|[^a-z]fpff[^a-z]", re.I), "fpff"),
+    (re.compile(r"personal.safety.and.social|[^a-z]pssr[^a-z]", re.I), "pssr"),
     (re.compile(r"proficiency.in.survival.craft|[^a-z]pscrb[^a-z]", re.I), "pscrb"),
-    (re.compile(r"advanced.fire.fighting|[^a-z]aff[^a-z]", re.I), "aff"),
+    (re.compile(r"advanced.fire.?fighting|[^a-z]aff[^a-z]", re.I), "aff"),
+    (re.compile(r"medical.first.aid|[^a-z]mfa[^a-z]", re.I), "mfa"),
+    (re.compile(r"medical.care|[^a-z]mc[^a-z]", re.I), "mc"),
+    (re.compile(r"fast.rescue.boat|[^a-z]frb[^a-z]", re.I), "frb"),
+    (re.compile(r"maritime.basic.safety", re.I), "pst"),  # BST bundle → pst
 ]
 
-# Date patterns: "12 Jan 2026", "12/01/2026", "2026-01-12"
-_DATE_PATTERNS: list[tuple[re.Pattern, str]] = [
-    (re.compile(r"\b(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})\b"), "dmy_text"),
-    (re.compile(r"\b(\d{2})/(\d{2})/(\d{4})\b"), "dmy_slash"),
-    (re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b"), "iso"),
-]
+# ------------------------------------------------------------------
+# Regex for STCW URLs in sitemap
+# ------------------------------------------------------------------
+_SITEMAP_STCW_RE = re.compile(
+    r"<loc>(https://shop\.relyon\.com/Course/CourseDetails/\d+/2/Stcw[^<]+)</loc>"
+)
 
-_PRICE_RE = re.compile(r"£\s*([\d,]+(?:\.\d{2})?)")
-_SPACES_RE = re.compile(r"(\d+)\s*(?:spaces?|places?|available)", re.I)
-
-_MONTH_NAMES = {
-    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
-    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
-    "january": 1, "february": 2, "march": 3, "april": 4, "june": 6,
-    "july": 7, "august": 8, "september": 9, "october": 10,
-    "november": 11, "december": 12,
-}
-
-
-def _parse_date(text: str) -> str | None:
-    """Return ISO date string from various date formats, or None."""
-    text = text.strip()
-    for pattern, fmt in _DATE_PATTERNS:
-        m = pattern.search(text)
-        if not m:
-            continue
-        try:
-            if fmt == "dmy_text":
-                day, month_str, year = int(m.group(1)), m.group(2).lower(), int(m.group(3))
-                month = _MONTH_NAMES.get(month_str[:3])
-                if not month:
-                    continue
-                return f"{year:04d}-{month:02d}-{day:02d}"
-            elif fmt == "dmy_slash":
-                day, month, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
-                return f"{year:04d}-{month:02d}-{day:02d}"
-            elif fmt == "iso":
-                return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-        except (ValueError, AttributeError):
-            continue
-    return None
+# ------------------------------------------------------------------
+# Regex for price in row text: "GBP 135.00" or "£135.00"
+# ------------------------------------------------------------------
+_PRICE_RE = re.compile(r"(?:GBP|£)\s*([\d,]+(?:\.\d{2})?)")
 
 
 def _provider_id_from_location(location: str) -> str:
-    """Map a location string to a provider_id."""
-    for pattern, provider_id in _LOCATION_MAP:
+    for pattern, pid in _LOCATION_MAP:
         if pattern.search(location):
-            return provider_id
+            return pid
     return _FALLBACK_PROVIDER_ID
 
 
 def _course_id_from_text(text: str) -> str | None:
-    """Return a course ID by matching text against the keyword map."""
     padded = f" {text} "
     for pattern, course_id in _COURSE_ID_MAP:
         if pattern.search(padded):
@@ -111,26 +98,47 @@ def _course_id_from_text(text: str) -> str | None:
     return None
 
 
+def _parse_price(text: str) -> float | None:
+    m = _PRICE_RE.search(text)
+    if m:
+        try:
+            return float(m.group(1).replace(",", ""))
+        except ValueError:
+            pass
+    return None
+
+
 def _location_slug(location: str) -> str:
-    """Convert a location name to a URL-safe slug."""
     return re.sub(r"[^a-z0-9]+", "-", location.lower()).strip("-") or "unknown"
 
 
+def _decamel(text: str) -> str:
+    """Split CamelCase slug into space-separated words for keyword matching."""
+    # Insert space before uppercase letters that follow lowercase letters
+    s = re.sub(r"([a-z])([A-Z])", r"\1 \2", text)
+    # Also handle digits followed by letters
+    s = re.sub(r"([0-9])([A-Za-z])", r"\1 \2", s)
+    return s
+
+
 class RelyOnAdapter(PlaywrightAdapter):
-    """Adapter for RelyOn Nutec's JS-rendered booking platform."""
+    """Adapter for RelyOn Nutec's booking platform (shop.relyon.com)."""
 
     def __init__(self) -> None:
-        pass
+        self._session = requests.Session()
+        self._session.headers.update({
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/html, */*",
+        })
 
     def fetch(self, provider: dict) -> list[Offering]:
-        """Fetch maritime course offerings from shop.relyon.com.
+        """Fetch STCW offerings from shop.relyon.com.
 
-        Although ``provider`` is a single provider dict, this adapter may
-        emit offerings for multiple provider_ids by inspecting each
-        offering's location.
+        Called once with any relyonnutec provider.  Returns offerings for all
+        UK locations (provider_id determined per-row from the location field).
         """
         try:
-            return self._fetch_all(provider)
+            return self._fetch_all()
         except Exception as e:
             logger.warning("RelyOn adapter unexpected error: %s", e)
             return []
@@ -139,296 +147,272 @@ class RelyOnAdapter(PlaywrightAdapter):
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _fetch_all(self, provider: dict) -> list[Offering]:
+    def _fetch_all(self) -> list[Offering]:
         now = datetime.now(timezone.utc).isoformat()
-        all_offerings: list[Offering] = []
-
-        # Step 1: load the homepage and look for a maritime/STCW section
-        html = self.fetch_rendered(SHOP_URL, timeout=30000)
-        if not html:
-            logger.warning("RelyOn: could not load homepage")
+        course_urls = self._discover_course_urls()
+        if not course_urls:
+            logger.warning("RelyOn: no STCW course URLs found in sitemap")
             return []
 
-        # Step 2: find course catalogue links from the homepage
-        course_urls = self._find_course_urls(html)
+        all_offerings: list[Offering] = []
+        seen_ids: set[str] = set()
 
-        if not course_urls:
-            # Fallback: try common catalogue paths
-            for path in ["/courses", "/maritime", "/stcw", "/training"]:
-                fallback_html = self.fetch_rendered(BASE_URL + path, timeout=20000)
-                if fallback_html:
-                    course_urls = self._find_course_urls(fallback_html)
-                    if course_urls:
-                        break
-
-        if not course_urls:
-            # Last resort: treat the homepage itself as the catalogue
-            course_urls = [(SHOP_URL, html)]
-
-        # Step 3: for each course URL, scrape date/location/price rows
-        for url, page_html in course_urls:
+        for url in course_urls:
+            # Slug is CamelCase — convert to words for keyword matching
+            slug = url.rsplit("/", 1)[-1]
+            course_id = _course_id_from_text(_decamel(slug))
+            if not course_id:
+                logger.debug("RelyOn: skipping (no course_id) %s", url)
+                continue
             try:
-                if page_html is None:
-                    page_html = self.fetch_rendered(url, timeout=20000)
-                if not page_html:
-                    continue
-                offerings = self._parse_course_page(page_html, url, now)
-                all_offerings.extend(offerings)
+                offerings = self._fetch_course_offerings(url, course_id, now)
+                for o in offerings:
+                    if o.id not in seen_ids:
+                        seen_ids.add(o.id)
+                        all_offerings.append(o)
             except Exception as e:
                 logger.warning("RelyOn: error processing %s: %s", url, e)
+            time.sleep(_REQUEST_DELAY)
 
-        # Deduplicate by offering id
-        seen_ids: set[str] = set()
-        unique: list[Offering] = []
-        for o in all_offerings:
-            if o.id not in seen_ids:
-                seen_ids.add(o.id)
-                unique.append(o)
+        logger.info("RelyOn adapter: %d unique offerings total", len(all_offerings))
+        return all_offerings
 
-        logger.info("RelyOn adapter: %d unique offerings total", len(unique))
-        return unique
-
-    def _find_course_urls(self, html: str) -> list[tuple[str, None]]:
-        """Return list of (absolute_url, None) tuples for maritime course pages."""
-        soup = BeautifulSoup(html, "lxml")
-        urls: list[tuple[str, None]] = []
-        seen: set[str] = set()
-
-        maritime_keywords = re.compile(
-            r"stcw|pst|efa|fpff|pssr|pscrb|aff|maritime|survival|firefighting|"
-            r"fire.prevention|elementary.first.aid|personal.safety|safety.sea",
-            re.I,
-        )
-
-        for a in soup.find_all("a", href=True):
-            href: str = a["href"].strip()
-            link_text = a.get_text(" ", strip=True)
-
-            # Only follow links that mention maritime/STCW subjects
-            if not maritime_keywords.search(href) and not maritime_keywords.search(link_text):
-                continue
-
-            # Skip anchor-only links, mailto, tel
-            if href.startswith(("#", "mailto:", "tel:")):
-                continue
-
-            # Build absolute URL
-            if href.startswith("http"):
-                abs_url = href
-            elif href.startswith("/"):
-                abs_url = BASE_URL + href
-            else:
-                abs_url = BASE_URL + "/" + href.lstrip("/")
-
-            # Keep only URLs on the same domain
-            if BASE_URL not in abs_url:
-                continue
-
-            if abs_url not in seen:
-                seen.add(abs_url)
-                urls.append((abs_url, None))
-
-        return urls
-
-    def _parse_course_page(
-        self, html: str, page_url: str, now: str
-    ) -> list[Offering]:
-        """Parse a course page for date/location/price rows."""
-        soup = BeautifulSoup(html, "lxml")
-
-        # Determine course ID from page title or heading
-        title_text = ""
-        for tag in ["h1", "h2", "title"]:
-            el = soup.find(tag)
-            if el:
-                title_text = el.get_text(" ", strip=True)
-                break
-
-        course_id = _course_id_from_text(title_text) or _course_id_from_text(page_url)
-        if not course_id:
-            logger.debug("RelyOn: could not determine course_id for %s", page_url)
+    def _discover_course_urls(self) -> list[str]:
+        """Return STCW course URLs from the sitemap (no JS required)."""
+        try:
+            resp = self._session.get(SITEMAP_URL, timeout=20)
+            resp.raise_for_status()
+            urls = _SITEMAP_STCW_RE.findall(resp.text)
+            logger.info("RelyOn: found %d STCW URLs in sitemap", len(urls))
+            return urls
+        except Exception as e:
+            logger.warning("RelyOn: sitemap fetch failed: %s", e)
             return []
 
+    def _fetch_course_offerings(
+        self, url: str, course_id: str, now: str
+    ) -> list[Offering]:
+        """Render the course detail page, extract JSON-LD + paginate via AJAX."""
+        # Page 1: render with Playwright to get JSON-LD and pagination metadata
+        html = self.fetch_rendered(url, timeout=30000)
+        if not html:
+            logger.warning("RelyOn: could not render %s", url)
+            return []
+
+        soup = BeautifulSoup(html, "lxml")
+
+        # Extract course type ID and country ID for AJAX pagination
+        course_type_id_inp = soup.find("input", id="course-type-id")
+        country_id_inp = soup.find("input", id="country-id")
+        total_inp = soup.find("input", id="hdn_total_records")
+        page_size_inp = soup.find("input", id="hdn_page_size")
+
+        course_type_id = int(course_type_id_inp["value"]) if course_type_id_inp else None
+        country_id = int(country_id_inp["value"]) if country_id_inp else 2
+        total_records = int(total_inp["value"]) if total_inp else 0
+        page_size = int(page_size_inp["value"]) if page_size_inp else 10
+
         offerings: list[Offering] = []
-        seen_keys: set[str] = set()
 
-        # Strategy A: look for structured date rows in tables
-        for row in soup.find_all("tr"):
-            o = self._row_to_offering(row, course_id, page_url, now)
-            if o and o.id not in seen_keys:
-                seen_keys.add(o.id)
-                offerings.append(o)
+        # Strategy 1: JSON-LD (reliable, structured, first page only)
+        ld_offerings = self._parse_jsonld(soup, course_id, url, now)
+        offerings.extend(ld_offerings)
 
-        # Strategy B: look for booking cards / list items containing dates
-        if not offerings:
-            for container in soup.find_all(
-                ["div", "li", "article", "section"],
-                class_=re.compile(
-                    r"course|event|date|session|booking|card|item|schedule", re.I
-                ),
-            ):
-                o = self._container_to_offering(container, course_id, page_url, now)
-                if o and o.id not in seen_keys:
-                    seen_keys.add(o.id)
-                    offerings.append(o)
+        # Strategy 2: fallback to tr_course_instance rows if JSON-LD empty
+        if not ld_offerings:
+            offerings.extend(
+                self._parse_instance_rows(soup, course_id, url, now)
+            )
+
+        # Paginate if there are more records
+        if course_type_id and total_records > page_size:
+            extra_pages = math.ceil(total_records / page_size) - 1
+            for page in range(2, extra_pages + 2):
+                time.sleep(_REQUEST_DELAY)
+                frag_offerings = self._fetch_ajax_page(
+                    course_type_id, country_id, page, page_size,
+                    course_id, url, now
+                )
+                offerings.extend(frag_offerings)
 
         return offerings
+
+    def _parse_jsonld(
+        self, soup: BeautifulSoup, course_id: str, page_url: str, now: str
+    ) -> list[Offering]:
+        """Extract offerings from JSON-LD ``hasCourseInstance`` array."""
+        offerings: list[Offering] = []
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                data = json.loads(script.get_text())
+            except (json.JSONDecodeError, ValueError):
+                continue
+
+            graph = data.get("@graph", [data]) if isinstance(data, dict) else []
+            for node in graph:
+                if node.get("@type") != "Course":
+                    continue
+                for inst in node.get("hasCourseInstance", []):
+                    o = self._jsonld_instance_to_offering(
+                        inst, course_id, page_url, now
+                    )
+                    if o:
+                        offerings.append(o)
+        return offerings
+
+    def _jsonld_instance_to_offering(
+        self, inst: dict, course_id: str, page_url: str, now: str
+    ) -> "Offering | None":
+        start_date = inst.get("startDate")
+        end_date = inst.get("endDate") or start_date
+        if not start_date:
+            return None
+
+        location_obj = inst.get("location", {})
+        location = location_obj.get("name", "") if isinstance(location_obj, dict) else ""
+        provider_id = _provider_id_from_location(location) if location else _FALLBACK_PROVIDER_ID
+
+        offers = inst.get("offers", {})
+        price: float | None = None
+        currency: str | None = None
+        if isinstance(offers, dict):
+            try:
+                price = float(offers["price"])
+            except (KeyError, ValueError, TypeError):
+                pass
+            currency = offers.get("priceCurrency") or ("GBP" if price is not None else None)
+
+        loc_slug = _location_slug(location) if location else "uk"
+        offering_id = f"{course_id}-relyon-{loc_slug}-{start_date}"
+
+        return Offering(
+            id=offering_id,
+            course_id=course_id,
+            provider_id=provider_id,
+            start_date=start_date,
+            end_date=end_date,
+            timezone="Europe/London",
+            duration_days=None,
+            price=price,
+            currency=currency,
+            vat_included=False,  # site states "Ex. VAT"
+            delivery_format="in_person",
+            availability=None,
+            booking_url=safe_url(page_url),
+            source_url=page_url,
+            last_verified=now,
+            freshness_status="verified",
+        )
+
+    def _parse_instance_rows(
+        self,
+        soup: BeautifulSoup,
+        course_id: str,
+        page_url: str,
+        now: str,
+    ) -> list[Offering]:
+        """Fallback: parse tr.tr_course_instance rows directly from HTML."""
+        offerings: list[Offering] = []
+        for row in soup.find_all("tr", class_="tr_course_instance"):
+            o = self._row_to_offering(row, course_id, page_url, now)
+            if o:
+                offerings.append(o)
+        return offerings
+
+    def _fetch_ajax_page(
+        self,
+        course_type_id: int,
+        country_id: int,
+        page: int,
+        page_size: int,
+        course_id: str,
+        page_url: str,
+        now: str,
+    ) -> list[Offering]:
+        """Fetch a paginated HTML fragment via the AJAX endpoint."""
+        try:
+            resp = self._session.post(
+                AJAX_URL,
+                json={
+                    "courseTypeId": course_type_id,
+                    "countryId": country_id,
+                    "page": page,
+                    "pageSize": page_size,
+                },
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Referer": page_url,
+                },
+                timeout=20,
+            )
+            resp.raise_for_status()
+        except Exception as e:
+            logger.warning("RelyOn AJAX page %d failed for %s: %s", page, page_url, e)
+            return []
+
+        soup = BeautifulSoup(resp.text, "lxml")
+        return self._parse_instance_rows(soup, course_id, page_url, now)
 
     def _row_to_offering(
         self, row, course_id: str, page_url: str, now: str
     ) -> "Offering | None":
-        """Try to build an Offering from a table row. Returns None if insufficient data."""
-        cells = row.find_all(["td", "th"])
-        if not cells:
+        """Build an Offering from a tr.tr_course_instance row."""
+        text = row.get_text(" ", strip=True)
+
+        # Dates: two dates appear in the text; first is start, second is end
+        # Pattern: "Date from 06 Aug 2026 06 Aug 2026"
+        date_pattern = re.compile(r"\b(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})\b")
+        month_map = {
+            "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+            "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        }
+        dates = []
+        for m in date_pattern.finditer(text):
+            month = month_map.get(m.group(2).lower()[:3])
+            if month:
+                dates.append(f"{m.group(3)}-{month:02d}-{int(m.group(1)):02d}")
+
+        if not dates:
             return None
 
-        row_text = " ".join(c.get_text(" ", strip=True) for c in cells)
+        start_date = dates[0]
+        end_date = dates[1] if len(dates) > 1 else start_date
 
-        start_date = _parse_date(row_text)
-        if not start_date:
-            return None
-
-        location = self._extract_location(row_text)
-        price = self._extract_price(row_text)
-        availability = self._extract_availability(row_text)
-
+        # Location
+        loc_m = re.search(
+            r"Location\s+([A-Z][a-zA-Z\s\-]{1,30}?)(?:\s+Language|\s+Price|\s*$)",
+            text,
+        )
+        location = loc_m.group(1).strip() if loc_m else ""
         provider_id = _provider_id_from_location(location) if location else _FALLBACK_PROVIDER_ID
 
-        # If location didn't map to a known provider, surface it in availability
-        if location and _provider_id_from_location(location) == _FALLBACK_PROVIDER_ID:
-            known_cities = {"aberdeen", "glasgow", "liverpool", "teesside"}
-            if not any(city in location.lower() for city in known_cities):
-                avail_note = f"Location: {location}"
-                availability = (
-                    f"{availability}; {avail_note}" if availability else avail_note
-                )
+        # Price
+        price = _parse_price(text)
 
         loc_slug = _location_slug(location) if location else "uk"
         offering_id = f"{course_id}-relyon-{loc_slug}-{start_date}"
 
-        # Find booking link within the row
-        booking_url: str | None = None
-        for a in row.find_all("a", href=True):
-            href = a["href"].strip()
-            if href and not href.startswith("#"):
-                booking_url = href if href.startswith("http") else BASE_URL + href
-                break
+        # Availability
+        availability: str | None = None
+        if re.search(r"fully.booked|sold.out|no.places|wait.list|call.for", text, re.I):
+            availability = "Fully booked"
 
         return Offering(
             id=offering_id,
             course_id=course_id,
             provider_id=provider_id,
             start_date=start_date,
-            end_date=start_date,
+            end_date=end_date,
             timezone="Europe/London",
             duration_days=None,
             price=price,
             currency="GBP" if price is not None else None,
-            vat_included=None,
+            vat_included=False,
             delivery_format="in_person",
             availability=availability,
-            booking_url=safe_url(booking_url or page_url),
+            booking_url=safe_url(page_url),
             source_url=page_url,
             last_verified=now,
             freshness_status="verified",
         )
-
-    def _container_to_offering(
-        self, container, course_id: str, page_url: str, now: str
-    ) -> "Offering | None":
-        """Try to build an Offering from a div/li/card container."""
-        text = container.get_text(" ", strip=True)
-
-        start_date = _parse_date(text)
-        if not start_date:
-            return None
-
-        location = self._extract_location(text)
-        price = self._extract_price(text)
-        availability = self._extract_availability(text)
-
-        provider_id = _provider_id_from_location(location) if location else _FALLBACK_PROVIDER_ID
-
-        if location and _provider_id_from_location(location) == _FALLBACK_PROVIDER_ID:
-            known_cities = {"aberdeen", "glasgow", "liverpool", "teesside"}
-            if not any(city in location.lower() for city in known_cities):
-                avail_note = f"Location: {location}"
-                availability = (
-                    f"{availability}; {avail_note}" if availability else avail_note
-                )
-
-        loc_slug = _location_slug(location) if location else "uk"
-        offering_id = f"{course_id}-relyon-{loc_slug}-{start_date}"
-
-        booking_url: str | None = None
-        for a in container.find_all("a", href=True):
-            href = a["href"].strip()
-            if href and not href.startswith("#"):
-                booking_url = href if href.startswith("http") else BASE_URL + href
-                break
-
-        return Offering(
-            id=offering_id,
-            course_id=course_id,
-            provider_id=provider_id,
-            start_date=start_date,
-            end_date=start_date,
-            timezone="Europe/London",
-            duration_days=None,
-            price=price,
-            currency="GBP" if price is not None else None,
-            vat_included=None,
-            delivery_format="in_person",
-            availability=availability,
-            booking_url=safe_url(booking_url or page_url),
-            source_url=page_url,
-            last_verified=now,
-            freshness_status="verified",
-        )
-
-    # ------------------------------------------------------------------
-    # Field extraction helpers
-    # ------------------------------------------------------------------
-
-    def _extract_location(self, text: str) -> str | None:
-        """Extract a location/venue name from a block of text."""
-        # Named UK cities relevant to RelyOn
-        city_pattern = re.compile(
-            r"\b(Aberdeen|Glasgow|Liverpool|Teesside|Middlesbrough|"
-            r"Hartlepool|Stockton|Newcastle|Edinburgh|Dundee)\b",
-            re.I,
-        )
-        m = city_pattern.search(text)
-        if m:
-            return m.group(1)
-
-        # Generic "Location: Foo" or "Venue: Foo" labels
-        label_pattern = re.compile(
-            r"(?:location|venue|centre|center)\s*[:\-]\s*([A-Za-z][A-Za-z\s\-]{1,40})",
-            re.I,
-        )
-        m2 = label_pattern.search(text)
-        if m2:
-            return m2.group(1).strip()
-
-        return None
-
-    def _extract_price(self, text: str) -> float | None:
-        """Extract a GBP price from text. Returns None if not found."""
-        m = _PRICE_RE.search(text)
-        if m:
-            try:
-                return float(m.group(1).replace(",", ""))
-            except ValueError:
-                pass
-        return None
-
-    def _extract_availability(self, text: str) -> str | None:
-        """Extract availability description (e.g. '5 spaces') from text."""
-        m = _SPACES_RE.search(text)
-        if m:
-            return m.group(0).strip()
-        # Check for "fully booked" / "sold out"
-        if re.search(r"fully.booked|sold.out|no.places|no.spaces", text, re.I):
-            return "Fully booked"
-        return None

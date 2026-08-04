@@ -13,8 +13,27 @@ function formatCountdown(secs: number): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
+function useSailorsHelped(): number | null {
+  const [count, setCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    // GoatCounter public stats API — no auth, no personal data
+    fetch('https://idratherbesailing.goatcounter.com/api/v0/stats/total', {
+      headers: { Accept: 'application/json' },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.total != null) setCount(data.total as number)
+      })
+      .catch(() => { /* silently ignore — counter is decorative */ })
+  }, [])
+
+  return count
+}
+
 export function RefreshCountdown() {
   const [secs, setSecs] = useState(getSecondsUntilMidnightUTC)
+  const sailorsHelped = useSailorsHelped()
 
   useEffect(() => {
     const id = setInterval(() => setSecs(getSecondsUntilMidnightUTC()), 1000)
@@ -28,27 +47,48 @@ export function RefreshCountdown() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '0.5rem',
+      gap: '1.25rem',
       background: 'var(--paper)',
+      flexWrap: 'wrap',
     }}>
-      <span style={{
-        fontFamily: 'var(--font-data)',
-        fontSize: '0.62rem',
-        letterSpacing: '0.07em',
-        textTransform: 'uppercase',
-        color: 'var(--ink-faint)',
-      }}>
-        Next data refresh
-      </span>
-      <span style={{
-        fontFamily: 'var(--font-data)',
-        fontSize: '0.68rem',
-        fontWeight: 700,
-        color: 'var(--navy-400)',
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '0.04em',
-      }}>
-        {formatCountdown(secs)}
+      {sailorsHelped !== null && (
+        <span style={{
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.62rem',
+          letterSpacing: '0.05em',
+          color: 'var(--ink-muted)',
+        }}>
+          <span style={{
+            fontWeight: 700,
+            color: 'var(--soundings)',
+            fontSize: '0.72rem',
+          }}>
+            {sailorsHelped.toLocaleString()}
+          </span>
+          {' '}sailors helped so far
+        </span>
+      )}
+
+      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <span style={{
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.62rem',
+          letterSpacing: '0.07em',
+          textTransform: 'uppercase',
+          color: 'var(--ink-faint)',
+        }}>
+          Next data refresh
+        </span>
+        <span style={{
+          fontFamily: 'var(--font-data)',
+          fontSize: '0.68rem',
+          fontWeight: 700,
+          color: 'var(--navy-400)',
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '0.04em',
+        }}>
+          {formatCountdown(secs)}
+        </span>
       </span>
     </footer>
   )

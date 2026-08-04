@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 USER_AGENT = "Mozilla/5.0 (compatible; IdRatherBeSailing/1.0; +https://github.com/bcheevers123/id-rather-be-sailing)"
 
-STCW_COURSE_PAGE = "https://fleetwoodnautical.blackpool.ac.uk/courses/maritime-stcw-courses"
+STCW_COURSE_PAGE = "https://fleetwoodnautical.blackpool.ac.uk/courses/offshore-stcw-courses"
 BASE_URL = "https://fleetwoodnautical.blackpool.ac.uk"
 
 # Map substrings found in course titles/names to MCA course_ids.
@@ -35,9 +35,9 @@ _COURSE_NAME_MAP: list[tuple[str, str]] = [
     ("AFF", "aff"),
     ("Fire Prevention and Fire Fighting", "fpff"),
     ("Fire Prevention", "fpff"),
+    # "Fire Fighting" alone must come after "Advanced Fire Fighting" and "Fire Prevention..."
     ("Fire Fighting", "fpff"),
     ("Elementary First Aid", "efa"),
-    ("First Aid", "efa"),
     ("Personal Safety and Social Responsibilit", "pssr"),
     ("Personal Safety", "pssr"),
     ("PSSR", "pssr"),
@@ -46,9 +46,13 @@ _COURSE_NAME_MAP: list[tuple[str, str]] = [
     ("PSCRB", "pscrb"),
     ("Fast Rescue Boat", "frb"),
     ("FRB", "frb"),
+    # Medical First Aid must come before the bare "First Aid" catch-all for EFA.
     ("Proficiency in Medical First Aid", "mfa"),
     ("Medical First Aid", "mfa"),
     ("Proficiency in Medical Care", "mc"),
+    ("Medical Care", "mc"),
+    # Bare "First Aid" catch-all — only reached if none of the above matched.
+    ("First Aid", "efa"),
 ]
 
 # Regex to extract price from strings like "2 Days/ £420" or "1 Week/ £1,340"
@@ -57,8 +61,8 @@ _PRICE_RE = re.compile(r"[£\xA3]\s*([\d,]+(?:\.\d{2})?)")
 # Regex for date strings like "15 Sep 2026" or "30 Nov 2026"
 _DATE_RE = re.compile(r"\b\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}\b")
 
-# Regex for course path links
-_COURSE_LINK_RE = re.compile(r"^/course/mx1ec", re.I)
+# Regex for course path links — offshore STCW courses use oe1ec prefix
+_COURSE_LINK_RE = re.compile(r"^/course/oe1ec", re.I)
 
 
 def _map_course_name(title: str) -> str | None:

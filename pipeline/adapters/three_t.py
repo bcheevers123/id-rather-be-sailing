@@ -326,7 +326,7 @@ def _parse_schedule_table(
         if end_date_iso is None:
             end_date_iso = start_date_iso
 
-        offering_id = f"{course_id}-3t-{start_date_iso}"
+        offering_id = f"{course_id}-3t-{provider['id']}-{start_date_iso}"
         if offering_id in seen:
             continue
         seen.add(offering_id)
@@ -402,7 +402,7 @@ def _scan_for_dates(
         if price is None and parent:
             price = _extract_price(parent.get_text())
 
-        offering_id = f"{course_id}-3t-{start_date_iso}"
+        offering_id = f"{course_id}-3t-{provider['id']}-{start_date_iso}"
         if offering_id in seen:
             continue
         seen.add(offering_id)

@@ -47,46 +47,92 @@ class StreamMarineAdapter(BaseAdapter):
         now = datetime.now(timezone.utc).isoformat()
         seen_dates: set[str] = set()
 
-        # Strategy 1: table rows — Arlo event pages use <tr> with date cells
-        for row in soup.find_all("tr"):
-            cells = row.find_all(["td", "th"])
-            if not cells:
+        # Strategy 1: Stream Marine's bespoke smt-event structure.
+        # Each session is a <div class="smt-event"> containing:
+        #   <div class="smt-event-date">DD Mon YYYY</div>
+        #   <div class="smt-event-register"><a href="https://...arlo.co/...">Register</a>
+        #     <span class="arlo-places-remaining">N places remaining</span>
+        #   </div>
+        smt_events = soup.find_all("div", class_="smt-event")
+        for event_el in smt_events:
+            date_el = event_el.find(class_="smt-event-date")
+            if not date_el:
                 continue
-            for cell in cells:
-                text = cell.get_text(strip=True)
-                m = _DATE_RE.search(text)
-                if not m:
-                    continue
-                try:
-                    d = dateutil_parser.parse(m.group(), fuzzy=False).date().isoformat()
-                except Exception:
-                    continue
-                if d in seen_dates:
-                    continue
-                seen_dates.add(d)
-                link = row.find("a", href=True)
-                price, vat_included, currency = _extract_price(row)
-                offerings.append(Offering(
-                    id=f"{self.course_id}-stream-{d}",
-                    course_id=self.course_id,
-                    provider_id=provider["id"],
-                    start_date=d,
-                    end_date=d,
-                    timezone="Europe/London",
-                    duration_days=None,
-                    price=price,
-                    currency=currency,
-                    vat_included=vat_included,
-                    delivery_format="in_person",
-                    availability=None,
-                    booking_url=safe_url(link["href"] if link else self.source_url),
-                    source_url=self.source_url,
-                    last_verified=now,
-                    freshness_status="verified",
-                ))
-                break  # one date per row
+            m = _DATE_RE.search(date_el.get_text(strip=True))
+            if not m:
+                continue
+            try:
+                d = dateutil_parser.parse(m.group(), fuzzy=False).date().isoformat()
+            except Exception:
+                continue
+            if d in seen_dates:
+                continue
+            seen_dates.add(d)
+            link = event_el.find("a", href=True)
+            # Availability from "N places remaining" span
+            avail_el = event_el.find(class_="arlo-places-remaining")
+            availability = avail_el.get_text(strip=True) if avail_el else None
+            price, vat_included, currency = _extract_price(event_el)
+            offerings.append(Offering(
+                id=f"{self.course_id}-stream-{d}",
+                course_id=self.course_id,
+                provider_id=provider["id"],
+                start_date=d,
+                end_date=d,
+                timezone="Europe/London",
+                duration_days=None,
+                price=price,
+                currency=currency,
+                vat_included=vat_included,
+                delivery_format="in_person",
+                availability=availability,
+                booking_url=safe_url(link["href"] if link else self.source_url),
+                source_url=self.source_url,
+                last_verified=now,
+                freshness_status="verified",
+            ))
 
-        # Strategy 2: elements with date-related class names
+        # Strategy 2: table rows — fallback for Arlo event pages that render <tr> with date cells
+        if not offerings:
+            for row in soup.find_all("tr"):
+                cells = row.find_all(["td", "th"])
+                if not cells:
+                    continue
+                for cell in cells:
+                    text = cell.get_text(strip=True)
+                    m = _DATE_RE.search(text)
+                    if not m:
+                        continue
+                    try:
+                        d = dateutil_parser.parse(m.group(), fuzzy=False).date().isoformat()
+                    except Exception:
+                        continue
+                    if d in seen_dates:
+                        continue
+                    seen_dates.add(d)
+                    link = row.find("a", href=True)
+                    price, vat_included, currency = _extract_price(row)
+                    offerings.append(Offering(
+                        id=f"{self.course_id}-stream-{d}",
+                        course_id=self.course_id,
+                        provider_id=provider["id"],
+                        start_date=d,
+                        end_date=d,
+                        timezone="Europe/London",
+                        duration_days=None,
+                        price=price,
+                        currency=currency,
+                        vat_included=vat_included,
+                        delivery_format="in_person",
+                        availability=None,
+                        booking_url=safe_url(link["href"] if link else self.source_url),
+                        source_url=self.source_url,
+                        last_verified=now,
+                        freshness_status="verified",
+                    ))
+                    break  # one date per row
+
+        # Strategy 3: elements with date-related class names (last resort)
         if not offerings:
             date_elements = soup.find_all(
                 class_=re.compile(r"date|schedule|session|event", re.I)
