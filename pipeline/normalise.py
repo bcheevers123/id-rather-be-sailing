@@ -12,8 +12,38 @@ def safe_url(url: str | None) -> str | None:
     return None
 
 
+_COMPANY_SUFFIX_RE = re.compile(
+    r"\b(limited|incorporated|corporation)\b", re.I
+)
+_COMPANY_SUFFIX_MAP = {
+    "limited": "ltd",
+    "incorporated": "inc",
+    "corporation": "corp",
+}
+
+
+def _normalise_company_name(text: str) -> str:
+    """Normalise common company name variations so slugs are stable."""
+    def _replace(m: re.Match) -> str:
+        return _COMPANY_SUFFIX_MAP.get(m.group(0).lower(), m.group(0).lower())
+    # Strip leading "The "
+    text = re.sub(r"^the\s+", "", text, flags=re.I)
+    text = _COMPANY_SUFFIX_RE.sub(_replace, text)
+    return text
+
+
+def canonical_name(text: str) -> str:
+    """Return a lower-case normalised name suitable for dedup matching."""
+    t = unicodedata.normalize("NFKD", text)
+    t = t.encode("ascii", "ignore").decode("ascii").lower().strip()
+    t = _normalise_company_name(t)
+    t = re.sub(r"[^a-z0-9 ]", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
 def make_slug(text: str, existing: set[str] | None = None) -> str:
     """Convert display text to a stable URL-safe slug."""
+    text = _normalise_company_name(text)
     text = unicodedata.normalize("NFKD", text)
     text = text.encode("ascii", "ignore").decode("ascii")
     text = text.lower()

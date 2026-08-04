@@ -95,7 +95,7 @@ from pipeline.geocode import geocode_providers
 from pipeline.change_detector import detect_changes
 from pipeline.freshness import compute_freshness
 from pipeline.mca_source import PdfLink, download_mca_page, fetch_pdf_links
-from pipeline.normalise import make_slug, normalise_provider
+from pipeline.normalise import make_slug, normalise_provider, canonical_name
 from pipeline.pdf_parser import parse_pdf
 from pipeline.report import build_coverage_report
 from pipeline.validate import validate_all
@@ -284,6 +284,7 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
     parse_failures: list[dict] = []
     existing_slugs: set[str] = set()
     raw_name_to_provider_id: dict[str, str] = {}
+    canonical_to_provider_id: dict[str, str] = {}
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
@@ -306,6 +307,12 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
             time.sleep(2)
 
             for raw in parsed.providers:
+                canon = canonical_name(raw.raw_name)
+                if canon in canonical_to_provider_id:
+                    # Same provider seen under a slightly different name — reuse existing ID
+                    pid = canonical_to_provider_id[canon]
+                    raw_name_to_provider_id[raw.raw_name] = pid
+                    continue
                 provider_dict = normalise_provider(
                     raw.raw_name, raw.location, raw.address,
                     raw.contact_details, raw.not_open_to_public, existing_slugs,
@@ -313,8 +320,8 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
                 if not raw.is_uk:
                     provider_dict["country"] = None
                 pid = provider_dict["id"]
-                if pid not in providers_by_id:
-                    providers_by_id[pid] = provider_dict
+                providers_by_id[pid] = provider_dict
+                canonical_to_provider_id[canon] = pid
                 raw_name_to_provider_id[raw.raw_name] = pid
 
             for raw_approval in parsed.approvals:
