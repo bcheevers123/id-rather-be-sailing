@@ -120,9 +120,8 @@ export function OtherProviders() {
           Other Providers
         </h1>
         <div style={{
-          background: 'var(--paper-sea)',
-          border: '1px solid var(--border)',
-          borderLeft: '3px solid var(--soundings)',
+          background: 'var(--soundings-bg)',
+          border: '1px solid oklch(82% 0.018 228)',
           borderRadius: '2px',
           padding: '0.875rem 1rem',
           fontSize: '0.8125rem',

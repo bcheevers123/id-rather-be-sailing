@@ -135,9 +135,8 @@ export function CourseResults() {
 
       {!course.earliest_known_date && (
         <div style={{
-          background: 'var(--paper-sea)',
-          border: '1px solid var(--border)',
-          borderLeft: '3px solid var(--soundings)',
+          background: 'var(--soundings-bg)',
+          border: '1px solid oklch(82% 0.018 228)',
           borderRadius: '2px',
           padding: '0.75rem 1rem',
           marginBottom: '1.25rem',
