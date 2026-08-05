@@ -24,8 +24,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58dadf60a6e36813cb4307/FPFF_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 24,
-    "earliest_known_date": "2026-08-05",
-    "lowest_known_price_gbp": 165.0
+    "earliest_known_date": "2026-08-06",
+    "lowest_known_price_gbp": 170.0
   },
   {
     "id": "efa",
@@ -584,8 +584,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a58dc775ca06bf11ccb4319/DSD_16.07.2026.pdf",
     "source_updated_date": "2026-07-16",
     "provider_count": 21,
-    "earliest_known_date": "2026-09-22",
-    "lowest_known_price_gbp": 450.0
+    "earliest_known_date": "2026-09-23",
+    "lowest_known_price_gbp": 220.0
   },
   {
     "id": "sso",
