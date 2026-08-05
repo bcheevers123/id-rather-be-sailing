@@ -48,6 +48,8 @@ export function CalendarView() {
   const [searchParams] = useSearchParams()
   const [date, setDate] = useState(new Date())
   const [view, setView] = useState<(typeof Views)[keyof typeof Views]>(Views.MONTH)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [hiddenCourses, setHiddenCourses] = useState<Set<string>>(new Set())
 
   const filterCourse = searchParams.get('course') ?? ''
   const filterProvider = searchParams.get('provider') ?? ''
@@ -68,10 +70,32 @@ export function CalendarView() {
     [filteredOfferings, courses, providers]
   )
 
+  const filterableCourses = useMemo(() => {
+    const seen = new Map<string, { id: string; name: string; color: string }>()
+    for (const e of events) {
+      const c = e.resource.course
+      if (!seen.has(c.id)) {
+        seen.set(c.id, {
+          id: c.id,
+          name: c.abbreviation ?? c.official_name,
+          color: courseColour(c.id, c.category),
+        })
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }, [events])
+
+  const visibleEvents = useMemo(
+    () => hiddenCourses.size === 0
+      ? events
+      : events.filter(e => !hiddenCourses.has(e.resource.course.id)),
+    [events, hiddenCourses]
+  )
+
   // Unique courses present in the visible events — for the legend
   const legendCourses = useMemo(() => {
     const seen = new Map<string, { name: string; color: string }>()
-    for (const e of events) {
+    for (const e of visibleEvents) {
       const c = e.resource.course
       if (!seen.has(c.id)) {
         seen.set(c.id, {
@@ -127,7 +151,7 @@ export function CalendarView() {
           Course Calendar
         </h1>
         <p style={{ fontSize: '0.8rem', color: 'var(--ink-faint)', fontFamily: 'var(--font-data)' }}>
-          {events.length} upcoming {events.length === 1 ? 'session' : 'sessions'} with confirmed dates · click to book
+          {visibleEvents.length} upcoming {visibleEvents.length === 1 ? 'session' : 'sessions'} with confirmed dates · click to book
         </p>
       </div>
 
@@ -157,6 +181,93 @@ export function CalendarView() {
         </div>
       )}
 
+      {/* Course filter panel */}
+      {filterableCourses.length > 0 && (
+        <div style={{ marginBottom: '0.75rem' }}>
+          <button
+            onClick={() => setFilterOpen(o => !o)}
+            style={{
+              background: 'none',
+              border: '1px solid var(--border)',
+              borderRadius: '4px',
+              padding: '0.3rem 0.75rem',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-data)',
+              fontSize: '0.75rem',
+              color: hiddenCourses.size > 0 ? 'var(--chart-red)' : 'var(--ink-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+            </svg>
+            {hiddenCourses.size > 0
+              ? `Filter courses (${hiddenCourses.size} hidden)`
+              : 'Filter courses'}
+          </button>
+
+          {filterOpen && (
+            <div style={{
+              marginTop: '0.5rem',
+              padding: '0.75rem',
+              border: '1px solid var(--border)',
+              borderRadius: '4px',
+              background: 'var(--surface)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.4rem',
+              maxHeight: '260px',
+              overflowY: 'auto',
+            }}>
+              <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                <button
+                  onClick={() => setHiddenCourses(new Set())}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--soundings)', padding: 0 }}
+                >
+                  Select all
+                </button>
+                <button
+                  onClick={() => setHiddenCourses(new Set(filterableCourses.map(c => c.id)))}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--ink-muted)', padding: 0 }}
+                >
+                  Clear all
+                </button>
+              </div>
+
+              {filterableCourses.map(({ id, name, color }) => (
+                <label key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={!hiddenCourses.has(id)}
+                    onChange={() => {
+                      setHiddenCourses(prev => {
+                        const next = new Set(prev)
+                        if (next.has(id)) next.delete(id)
+                        else next.add(id)
+                        return next
+                      })
+                    }}
+                    style={{ accentColor: color, width: '13px', height: '13px' }}
+                  />
+                  <span style={{
+                    display: 'inline-block',
+                    width: 8, height: 8,
+                    borderRadius: 2,
+                    background: color,
+                    flexShrink: 0,
+                  }} />
+                  <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.75rem', color: 'var(--ink-muted)' }}>
+                    {name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         aria-label="Course calendar"
         style={{
@@ -169,7 +280,7 @@ export function CalendarView() {
       >
         <Calendar
           localizer={localizer}
-          events={events}
+          events={visibleEvents}
           startAccessor="start"
           endAccessor="end"
           date={date}
