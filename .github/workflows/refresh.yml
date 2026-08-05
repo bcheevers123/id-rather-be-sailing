@@ -33,6 +33,7 @@ jobs:
         run: python -m pipeline.generate
         env:
           PYTHONUNBUFFERED: '1'
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
 
       - name: Check for changes
         id: changes

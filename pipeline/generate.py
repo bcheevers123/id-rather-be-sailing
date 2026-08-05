@@ -1136,6 +1136,26 @@ def run_pipeline(dry_run: bool = False, output_dir: Path | None = None) -> None:
     _write_json(out_dir / "coverage_report.json", report)
     _write_json(out_dir / "retrieval_log.json", [])
 
+    import os
+    gc_token = os.environ.get("GOATCOUNTER_TOKEN", "")
+    if gc_token:
+        try:
+            gc_resp = session.get(
+                "https://idratherbesailing.goatcounter.com/api/v0/stats/total",
+                headers={"Authorization": f"Bearer {gc_token}"},
+                timeout=10,
+            )
+            if gc_resp.ok:
+                gc_data = gc_resp.json()
+                _write_json(out_dir / "stats.json", {"total_visitors": gc_data.get("total", 0)})
+                logger.info("GoatCounter total visitors: %d", gc_data.get("total", 0))
+            else:
+                logger.warning("GoatCounter API returned %d", gc_resp.status_code)
+        except Exception as exc:
+            logger.warning("GoatCounter fetch failed: %s", exc)
+    else:
+        logger.info("GOATCOUNTER_TOKEN not set — skipping stats.json")
+
     logger.info(
         "Pipeline complete. %d courses, %d providers, %d approvals, %d offerings",
         len(valid_courses), len(valid_providers), len(valid_approvals), len(valid_offerings),
