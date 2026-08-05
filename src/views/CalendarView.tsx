@@ -7,7 +7,7 @@ import { format, parse, startOfWeek, getDay, addMonths } from 'date-fns'
 import { enGB } from 'date-fns/locale'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useData } from '../hooks/useData'
-import { toCalendarEvents, courseColour } from '../lib/calendarEvents'
+import { toCalendarEvents, courseColour, groupCalendarEvents } from '../lib/calendarEvents'
 import type { CalEvent } from '../lib/calendarEvents'
 import { safeHref } from '../lib/safeHref'
 
@@ -64,7 +64,7 @@ export function CalendarView() {
   }, [offerings, filterCourse, filterProvider])
 
   const events = useMemo(
-    () => toCalendarEvents(filteredOfferings, courses, providers),
+    () => groupCalendarEvents(toCalendarEvents(filteredOfferings, courses, providers)),
     [filteredOfferings, courses, providers]
   )
 
@@ -84,8 +84,12 @@ export function CalendarView() {
   }, [events])
 
   const handleSelectEvent = useCallback((event: CalEvent) => {
-    const url = safeHref(event.resource.offering.booking_url)
-    if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    if (event.groupCount > 1) {
+      window.location.href = `${import.meta.env.BASE_URL}course/${event.resource.course.id}`
+    } else {
+      const url = safeHref(event.resource.offering.booking_url)
+      if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    }
   }, [])
 
   if (loading) {

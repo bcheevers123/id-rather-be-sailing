@@ -2,6 +2,7 @@ import type { Offering, Course, Provider } from '../types/data'
 
 export interface CalEventResource {
   offering: Offering
+  offerings: Offering[]
   course: Course
   provider: Provider
 }
@@ -13,6 +14,7 @@ export interface CalEvent {
   end: Date
   allDay: true
   color: string
+  groupCount: number
   resource: CalEventResource
 }
 
@@ -84,9 +86,39 @@ export function toCalendarEvents(
       end: endDate,
       allDay: true,
       color: courseColour(course.id, course.category),
-      resource: { offering, course, provider },
+      groupCount: 1,
+      resource: { offering, offerings: [offering], course, provider },
     })
   }
 
   return events
+}
+
+export function groupCalendarEvents(events: CalEvent[]): CalEvent[] {
+  const key = (e: CalEvent) =>
+    `${e.resource.course.id}::${e.start.toISOString().slice(0, 10)}`
+
+  const groups = new Map<string, CalEvent[]>()
+  for (const e of events) {
+    const k = key(e)
+    const existing = groups.get(k)
+    if (existing) existing.push(e)
+    else groups.set(k, [e])
+  }
+
+  return Array.from(groups.values()).map(group => {
+    if (group.length === 1) return { ...group[0], groupCount: 1 }
+    const first = group[0]
+    const label = first.resource.course.abbreviation ?? first.resource.course.official_name
+    return {
+      ...first,
+      id: `group::${key(first)}`,
+      title: `${label} (${group.length})`,
+      groupCount: group.length,
+      resource: {
+        ...first.resource,
+        offerings: group.map(e => e.resource.offering),
+      },
+    }
+  })
 }
