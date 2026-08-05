@@ -22,8 +22,13 @@ export function CompassRose({ size = 120, className, style }: Props) {
       const dx = clientX - cx
       const dy = clientY - cy
       // atan2 from compass centre to cursor; offset so 0° = north (up)
-      const deg = (Math.atan2(dx, -dy) * 180) / Math.PI
-      setAngle(deg)
+      const rawDeg = (Math.atan2(dx, -dy) * 180) / Math.PI
+      setAngle(prev => {
+        let delta = rawDeg - ((prev % 360) + (prev % 360 < -180 ? 360 : prev % 360 > 180 ? -360 : 0))
+        if (delta > 180) delta -= 360
+        if (delta < -180) delta += 360
+        return prev + delta
+      })
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('touchmove', onMove, { passive: true })
