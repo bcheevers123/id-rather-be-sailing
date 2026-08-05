@@ -1,6 +1,19 @@
 import { useMemo, useState } from 'react'
 import { useData } from '../hooks/useData'
 import type { Provider, Approval, Course } from '../types/data'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+})
 
 // Normalise the "country" field. GB providers have country="GB" but international
 // providers encode their country in the region field (the PDF parser didn't populate
@@ -249,6 +262,48 @@ function RegionSection({
   )
 }
 
+function ProvidersMap({ providers }: { providers: Provider[] }) {
+  const mappable = providers.filter(
+    p => !p.not_open_to_public && p.lat !== null && p.lng !== null
+  ) as (Provider & { lat: number; lng: number })[]
+
+  return (
+    <div style={{ height: '400px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
+      <MapContainer
+        center={[54.5, -3.0]}
+        zoom={6}
+        style={{ height: '100%', width: '100%' }}
+        scrollWheelZoom={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {mappable.map(p => (
+          <Marker key={p.id} position={[p.lat, p.lng]}>
+            <Popup>
+              <strong style={{ fontSize: '0.85rem' }}>{p.official_name}</strong>
+              {(p.region || p.city) && (
+                <div style={{ fontSize: '0.75rem', color: '#555', marginTop: '2px' }}>
+                  {p.city ?? p.region?.replace(/\n/g, ', ')}
+                </div>
+              )}
+              {p.website && (
+                <div style={{ marginTop: '4px' }}>
+                  <a href={p.website} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: '0.75rem', color: '#1a5276' }}>
+                    View website →
+                  </a>
+                </div>
+              )}
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
+  )
+}
+
 export function MapView() {
   const { providers, approvals, courses, loading, error } = useData()
   const [search, setSearch] = useState('')
@@ -337,6 +392,9 @@ export function MapView() {
           onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
         />
       </div>
+
+      {/* Interactive map */}
+      <ProvidersMap providers={providers} />
 
       {/* UK sections */}
       {ukRegions.length > 0 && (
