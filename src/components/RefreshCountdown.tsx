@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSailorsHelped } from '../hooks/useSailorsHelped'
 
 function getSecondsUntilMidnightUTC(): number {
   const now = new Date()
@@ -11,24 +12,6 @@ function formatCountdown(secs: number): string {
   const m = Math.floor((secs % 3600) / 60)
   const s = secs % 60
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-}
-
-function useSailorsHelped(): number | null {
-  const [count, setCount] = useState<number | null>(null)
-
-  useEffect(() => {
-    // GoatCounter public stats API — no auth, no personal data
-    fetch('https://idratherbesailing.goatcounter.com/api/v0/stats/total', {
-      headers: { Accept: 'application/json' },
-    })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.total != null) setCount(data.total as number)
-      })
-      .catch(() => { /* silently ignore — counter is decorative */ })
-  }, [])
-
-  return count
 }
 
 export function RefreshCountdown() {
