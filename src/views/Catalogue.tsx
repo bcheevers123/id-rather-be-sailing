@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../hooks/useData'
+import { useSailorsHelped } from '../hooks/useSailorsHelped'
 import { buildSearchIndex, searchCourses } from '../lib/search'
 import { SearchBar } from '../components/SearchBar'
 import { CourseCard } from '../components/CourseCard'
@@ -122,6 +123,7 @@ export function Catalogue() {
   const { courses, loading, error } = useData()
   const [searchParams, setSearchParams] = useSearchParams()
   const [openCategories, setOpenCategories] = useState<Set<CourseCategory>>(new Set())
+  const sailorsHelped = useSailorsHelped()
   const query = searchParams.get('q') ?? ''
 
   const fuse = useMemo(() => buildSearchIndex(courses), [courses])
@@ -220,6 +222,15 @@ export function Catalogue() {
           <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', lineHeight: 1.6, margin: 0 }}>
             Every MCA-approved course with live dates and prices, refreshed daily.
           </p>
+          {sailorsHelped !== null && (
+            <p style={{ fontSize: '0.8125rem', color: 'var(--ink-muted)', lineHeight: 1.6, margin: '0.2rem 0 0' }}>
+              Already helped{' '}
+              <strong style={{ color: 'var(--soundings)', fontWeight: 700 }}>
+                {sailorsHelped.toLocaleString()} sailors
+              </strong>
+              {' '}find their next course.
+            </p>
+          )}
         </div>
 
         {/* Sloop silhouette — hidden on narrow mobile */}
