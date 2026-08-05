@@ -145,8 +145,8 @@ class OndeckAdapter(BaseAdapter):
             )
             return []
 
-        # reCAPTCHA Enterprise requires a non-headless browser for a valid score.
-        headless = os.environ.get("ONDECK_HEADLESS", "0") == "1"
+        # Default headless=True for CI; set ONDECK_HEADLESS=0 locally if you need a visible browser.
+        headless = os.environ.get("ONDECK_HEADLESS", "1") == "1"
         # Optionally use an existing Chrome profile for better reCAPTCHA scores.
         chrome_profile = os.environ.get("ONDECK_CHROME_PROFILE", "")
 
