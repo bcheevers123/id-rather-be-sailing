@@ -1,0 +1,23 @@
+/* Gentle sailing motion for background vessels.
+   Animates the standalone CSS `translate` property so it composes with
+   the inline `transform: rotate / scaleX` without overriding it. */
+
+@keyframes sail-a { 0%,100%{translate:0 0}  40%{translate:18px -5px}  70%{translate:8px 2px} }
+@keyframes sail-b { 0%,100%{translate:0 0}  35%{translate:-14px -4px} 65%{translate:-22px 3px} }
+@keyframes sail-c { 0%,100%{translate:0 0}  50%{translate:12px -3px} }
+@keyframes sail-d { 0%,100%{translate:0 0}  45%{translate:16px -6px}  80%{translate:7px 2px} }
+@keyframes sail-e { 0%,100%{translate:0 0}  30%{translate:-9px -3px}  60%{translate:-17px 4px} }
+@keyframes sail-f { 0%,100%{translate:0 0}  55%{translate:11px -4px} }
+@keyframes sail-g { 0%,100%{translate:0 0}  40%{translate:-11px -3px} 75%{translate:-5px 2px} }
+@keyframes sail-h { 0%,100%{translate:0 0}  35%{translate:9px -2px}   65%{translate:17px 3px} }
+@keyframes sail-i { 0%,100%{translate:0 0}  50%{translate:-7px -4px} }
+
+.vessel-1 { animation: sail-a 38s ease-in-out infinite; }
+.vessel-2 { animation: sail-b 29s ease-in-out infinite; }
+.vessel-3 { animation: sail-c 45s ease-in-out infinite; }
+.vessel-4 { animation: sail-d 33s ease-in-out infinite; }
+.vessel-5 { animation: sail-e 41s ease-in-out infinite; }
+.vessel-6 { animation: sail-f 27s ease-in-out infinite; }
+.vessel-7 { animation: sail-g 36s ease-in-out infinite; }
+.vessel-8 { animation: sail-h 31s ease-in-out infinite; }
+.vessel-9 { animation: sail-i 50s ease-in-out infinite; }

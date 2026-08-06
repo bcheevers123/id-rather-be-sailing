@@ -1,5 +1,6 @@
 // Faint nautical silhouettes for background decoration — same ink style as SloopSilhouette.
 // Rendered at low opacity as chart illustrations scattered across the page.
+import './ChartVessels.css'
 
 const ink  = 'var(--navy-950)'
 const sail = 'var(--navy-100)'
@@ -142,47 +143,47 @@ export function ChartVesselsBackground() {
       overflow: 'hidden',
     }}>
       {/* 1 — Tall ship far left, upper-mid */}
-      <div style={{ position: 'absolute', left: '-3rem', top: '28%', opacity: 0.055, transform: 'rotate(-2deg)' }}>
+      <div className="vessel-1" style={{ position: 'absolute', left: '-3rem', top: '28%', opacity: 0.055, transform: 'rotate(-2deg)' }}>
         <TallShip width={270} height={184} />
       </div>
 
       {/* 2 — Ketch far right, upper */}
-      <div style={{ position: 'absolute', right: '-1.5rem', top: '15%', opacity: 0.06, transform: 'scaleX(-1) rotate(1deg)' }}>
+      <div className="vessel-2" style={{ position: 'absolute', right: '-1.5rem', top: '15%', opacity: 0.06, transform: 'scaleX(-1) rotate(1deg)' }}>
         <Ketch width={200} height={141} />
       </div>
 
       {/* 3 — Schooner centre-left, behind hero */}
-      <div style={{ position: 'absolute', left: '18%', top: '8%', opacity: 0.04, transform: 'rotate(-1deg)' }}>
+      <div className="vessel-3" style={{ position: 'absolute', left: '18%', top: '8%', opacity: 0.04, transform: 'rotate(-1deg)' }}>
         <Schooner width={200} height={137} />
       </div>
 
       {/* 4 — Small sloop bottom-left */}
-      <div style={{ position: 'absolute', left: '2%', bottom: '10%', opacity: 0.05, transform: 'rotate(1.5deg)' }}>
+      <div className="vessel-4" style={{ position: 'absolute', left: '2%', bottom: '10%', opacity: 0.05, transform: 'rotate(1.5deg)' }}>
         <Sloop width={130} height={100} />
       </div>
 
       {/* 5 — Tall ship bottom-right */}
-      <div style={{ position: 'absolute', right: '-3rem', bottom: '14%', opacity: 0.045, transform: 'scaleX(-1) rotate(-1.5deg)' }}>
+      <div className="vessel-5" style={{ position: 'absolute', right: '-3rem', bottom: '14%', opacity: 0.045, transform: 'scaleX(-1) rotate(-1.5deg)' }}>
         <TallShip width={210} height={143} />
       </div>
 
       {/* 6 — Motor vessel centre-right, low */}
-      <div style={{ position: 'absolute', right: '12%', bottom: '5%', opacity: 0.04, transform: 'rotate(0.5deg)' }}>
+      <div className="vessel-6" style={{ position: 'absolute', right: '12%', bottom: '5%', opacity: 0.04, transform: 'rotate(0.5deg)' }}>
         <MotorVessel width={170} height={85} />
       </div>
 
       {/* 7 — Small ketch top-right corner */}
-      <div style={{ position: 'absolute', right: '3%', top: '52%', opacity: 0.038, transform: 'scaleX(-1) rotate(-1deg)' }}>
+      <div className="vessel-7" style={{ position: 'absolute', right: '3%', top: '52%', opacity: 0.038, transform: 'scaleX(-1) rotate(-1deg)' }}>
         <Ketch width={130} height={92} />
       </div>
 
       {/* 8 — Schooner bottom-centre */}
-      <div style={{ position: 'absolute', left: '38%', bottom: '3%', opacity: 0.038, transform: 'scaleX(-1) rotate(1deg)' }}>
+      <div className="vessel-8" style={{ position: 'absolute', left: '38%', bottom: '3%', opacity: 0.038, transform: 'scaleX(-1) rotate(1deg)' }}>
         <Schooner width={160} height={110} />
       </div>
 
       {/* 9 — Tiny sloop top-left, very faint */}
-      <div style={{ position: 'absolute', left: '28%', top: '3%', opacity: 0.032, transform: 'rotate(-0.5deg)' }}>
+      <div className="vessel-9" style={{ position: 'absolute', left: '28%', top: '3%', opacity: 0.032, transform: 'rotate(-0.5deg)' }}>
         <Sloop width={100} height={77} />
       </div>
     </div>
