@@ -60,6 +60,7 @@ export function CalendarView() {
   const [hiddenCourses, setHiddenCourses] = useState<Set<string>>(new Set())
   const [hiddenLocations, setHiddenLocations] = useState<Set<string>>(new Set())
   const [calendarHeight, setCalendarHeight] = useState(700)
+  const [calendarWidth, setCalendarWidth] = useState(100)
 
   const filterCourse = searchParams.get('course') ?? ''
   const filterProvider = searchParams.get('provider') ?? ''
@@ -223,17 +224,17 @@ export function CalendarView() {
         {/* Calendar height control */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--ink-faint)' }}>Row height</span>
-          <button
-            onClick={() => setCalendarHeight(h => Math.max(400, h - 100))}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }}
-            aria-label="Decrease calendar height"
-          >−</button>
+          <button onClick={() => setCalendarHeight(h => Math.max(400, h - 100))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }} aria-label="Decrease calendar height">−</button>
           <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--ink-muted)', minWidth: 36, textAlign: 'center' }}>{calendarHeight}px</span>
-          <button
-            onClick={() => setCalendarHeight(h => Math.min(2000, h + 100))}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }}
-            aria-label="Increase calendar height"
-          >+</button>
+          <button onClick={() => setCalendarHeight(h => Math.min(2000, h + 100))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }} aria-label="Increase calendar height">+</button>
+        </div>
+
+        {/* Calendar width control */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--ink-faint)' }}>Col width</span>
+          <button onClick={() => setCalendarWidth(w => Math.max(100, w - 25))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }} aria-label="Decrease calendar width">−</button>
+          <span style={{ fontFamily: 'var(--font-data)', fontSize: '0.72rem', color: 'var(--ink-muted)', minWidth: 36, textAlign: 'center' }}>{calendarWidth}%</span>
+          <button onClick={() => setCalendarWidth(w => Math.min(400, w + 25))} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '3px', width: 22, height: 22, cursor: 'pointer', color: 'var(--ink-muted)', fontSize: '0.85rem', lineHeight: 1, padding: 0 }} aria-label="Increase calendar width">+</button>
         </div>
       </div>
 
@@ -299,6 +300,7 @@ export function CalendarView() {
         </div>
       )}
 
+      <div style={{ overflowX: 'auto' }}>
       <div
         aria-label="Course calendar"
         style={{
@@ -306,7 +308,7 @@ export function CalendarView() {
           border: '1px solid var(--border)',
           borderRadius: '4px',
           padding: '1rem',
-          overflowY: 'auto',
+          minWidth: `${calendarWidth}%`,
         }}
       >
         <Calendar
@@ -334,6 +336,7 @@ export function CalendarView() {
             return `${course.official_name}\n${provider.official_name}${price}`
           }}
         />
+      </div>
       </div>
     </div>
   )
