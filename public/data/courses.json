@@ -10,7 +10,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc2e3bd75b81e23299c0/PST_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 36,
-    "earliest_known_date": "2026-08-16",
+    "earliest_known_date": "2026-08-17",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -38,7 +38,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc0b3bd75b81e23299bf/EFA_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 41,
-    "earliest_known_date": "2026-08-17",
+    "earliest_known_date": "2026-08-18",
     "lowest_known_price_gbp": 120.0
   },
   {
@@ -52,8 +52,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc243be22055c1aaa2f5/PSSR_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 32,
-    "earliest_known_date": "2026-08-16",
-    "lowest_known_price_gbp": 95.0
+    "earliest_known_date": "2026-08-17",
+    "lowest_known_price_gbp": 100.0
   },
   {
     "id": "aff",
@@ -66,8 +66,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edf9a3bd75b81e23299ce/AFF_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 19,
-    "earliest_known_date": "2026-08-16",
-    "lowest_known_price_gbp": 40.0
+    "earliest_known_date": "2026-08-17",
+    "lowest_known_price_gbp": 180.0
   },
   {
     "id": "pscrb",
@@ -80,7 +80,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc451f783fe89daaa2ef/PSCRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 11,
-    "earliest_known_date": "2026-08-16",
+    "earliest_known_date": "2026-08-17",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -108,7 +108,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edfb203b4fe14b1e7de53/MFA_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 23,
-    "earliest_known_date": "2026-08-16",
+    "earliest_known_date": "2026-08-17",
     "lowest_known_price_gbp": 500.0
   },
   {
@@ -136,7 +136,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc373bd75b81e23299c1/FRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 7,
-    "earliest_known_date": "2026-08-16",
+    "earliest_known_date": "2026-08-17",
     "lowest_known_price_gbp": 185.0
   },
   {
