@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-08-25T07:47:22.582648+00:00",
+  "generated_at": "2026-08-26T07:41:09.280798+00:00",
   "total_courses": 74,
   "total_providers": 141,
   "total_approvals": 637,
-  "providers_with_dates": 53,
-  "providers_with_prices": 32,
+  "providers_with_dates": 45,
+  "providers_with_prices": 25,
   "providers_requiring_manual_review": 0,
   "providers_blocking_automated_collection": 0,
-  "providers_no_public_schedule": 88,
-  "last_successful_full_refresh": "2026-08-25T07:47:22.582660+00:00",
+  "providers_no_public_schedule": 96,
+  "last_successful_full_refresh": "2026-08-26T07:41:09.280811+00:00",
   "parse_failures": []
 }
