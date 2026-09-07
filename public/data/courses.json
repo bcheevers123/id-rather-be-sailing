@@ -10,7 +10,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc2e3bd75b81e23299c0/PST_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 36,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -52,7 +52,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc243be22055c1aaa2f5/PSSR_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 32,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 95.0
   },
   {
@@ -66,7 +66,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edf9a3bd75b81e23299ce/AFF_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 19,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 40.0
   },
   {
@@ -80,7 +80,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc451f783fe89daaa2ef/PSCRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 11,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -105,10 +105,10 @@
     "category": "stcw_advanced",
     "description": null,
     "confusion_note": null,
-    "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edfb203b4fe14b1e7de53/MFA_13.08.2026.pdf",
-    "source_updated_date": "2026-08-13",
+    "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a9ea3ea01bbff0bf8f97ed9/MFA_07.09.26.pdf",
+    "source_updated_date": "2026-09-07",
     "provider_count": 23,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 500.0
   },
   {
@@ -122,7 +122,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edfa13be22055c1aaa2ff/MC_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 15,
-    "earliest_known_date": "2026-09-07",
+    "earliest_known_date": "2026-09-14",
     "lowest_known_price_gbp": 599.0
   },
   {
@@ -136,7 +136,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edc373bd75b81e23299c1/FRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 7,
-    "earliest_known_date": "2026-09-06",
+    "earliest_known_date": "2026-09-07",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -192,7 +192,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edcf63be22055c1aaa2f7/UPSCRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 11,
-    "earliest_known_date": "2026-09-07",
+    "earliest_known_date": "2026-09-14",
     "lowest_known_price_gbp": 299.0
   },
   {
@@ -234,7 +234,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edcff3be22055c1aaa2f8/UFRB_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 8,
-    "earliest_known_date": null,
+    "earliest_known_date": "2026-10-01",
     "lowest_known_price_gbp": null
   },
   {
@@ -444,7 +444,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6a7edfc13be22055c1aaa300/HELM-M_13.08.2026.pdf",
     "source_updated_date": "2026-08-13",
     "provider_count": 12,
-    "earliest_known_date": "2026-09-07",
+    "earliest_known_date": "2026-09-14",
     "lowest_known_price_gbp": 850.0
   },
   {
