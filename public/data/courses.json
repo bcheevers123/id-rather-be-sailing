@@ -38,7 +38,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b36c62ec7fe7bedf534e/EFA_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 41,
-    "earliest_known_date": "2026-09-20",
+    "earliest_known_date": "2026-09-21",
     "lowest_known_price_gbp": 120.0
   },
   {
@@ -708,7 +708,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aad5df7086ce7c57b818713/AMC_18.09.26.pdf",
-    "source_updated_date": "2026-09-19",
+    "source_updated_date": "2026-09-20",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
