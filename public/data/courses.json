@@ -10,7 +10,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2af439f95f408139c6613/PST_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 36,
-    "earliest_known_date": "2026-09-25",
+    "earliest_known_date": "2026-09-28",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -38,7 +38,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b36c62ec7fe7bedf534e/EFA_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 41,
-    "earliest_known_date": "2026-09-25",
+    "earliest_known_date": "2026-09-28",
     "lowest_known_price_gbp": 120.0
   },
   {
@@ -52,8 +52,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2af2b62ec7fe7bedf533a/PSSR_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 32,
-    "earliest_known_date": "2026-09-25",
-    "lowest_known_price_gbp": 95.0
+    "earliest_known_date": "2026-09-28",
+    "lowest_known_price_gbp": 105.0
   },
   {
     "id": "aff",
@@ -122,7 +122,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b4145f6e942efe37f104/MC_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 15,
-    "earliest_known_date": "2026-09-26",
+    "earliest_known_date": "2026-09-28",
     "lowest_known_price_gbp": 599.0
   },
   {
@@ -164,7 +164,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b07b5f6e942efe37f0f5/UAFF_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 18,
-    "earliest_known_date": "2026-09-29",
+    "earliest_known_date": "2026-10-14",
     "lowest_known_price_gbp": 299.0
   },
   {
@@ -192,7 +192,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b0da62ec7fe7bedf5344/UPSCRB_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 11,
-    "earliest_known_date": "2026-09-30",
+    "earliest_known_date": "2026-10-12",
     "lowest_known_price_gbp": 299.0
   },
   {
@@ -234,7 +234,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b0b85f6e942efe37f0f8/UFRB_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 8,
-    "earliest_known_date": "2026-10-01",
+    "earliest_known_date": null,
     "lowest_known_price_gbp": null
   },
   {
@@ -708,7 +708,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aad5df7086ce7c57b818713/AMC_18.09.26.pdf",
-    "source_updated_date": "2026-09-25",
+    "source_updated_date": "2026-09-26",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
