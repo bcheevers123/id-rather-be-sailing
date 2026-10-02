@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-01T13:52:48.163191+00:00",
+  "generated_at": "2026-10-02T13:07:55.519515+00:00",
   "total_courses": 75,
   "total_providers": 145,
   "total_approvals": 639,
@@ -8,6 +8,6 @@
   "providers_requiring_manual_review": 0,
   "providers_blocking_automated_collection": 0,
   "providers_no_public_schedule": 91,
-  "last_successful_full_refresh": "2026-10-01T13:52:48.163202+00:00",
+  "last_successful_full_refresh": "2026-10-02T13:07:55.519533+00:00",
   "parse_failures": []
 }
