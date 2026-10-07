@@ -10,7 +10,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2af439f95f408139c6613/PST_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 36,
-    "earliest_known_date": "2026-10-06",
+    "earliest_known_date": "2026-10-07",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -24,7 +24,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b39d62ec7fe7bedf534f/FPFF_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 24,
-    "earliest_known_date": "2026-10-06",
+    "earliest_known_date": "2026-10-08",
     "lowest_known_price_gbp": 165.0
   },
   {
@@ -52,7 +52,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2af2b62ec7fe7bedf533a/PSSR_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 32,
-    "earliest_known_date": "2026-10-06",
+    "earliest_known_date": "2026-10-07",
     "lowest_known_price_gbp": 95.0
   },
   {
@@ -66,7 +66,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b3d99f95f408139c661b/AFF_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 19,
-    "earliest_known_date": "2026-10-06",
+    "earliest_known_date": "2026-10-08",
     "lowest_known_price_gbp": 180.0
   },
   {
@@ -108,7 +108,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2ae7ac5796a7a179c6661/MFA_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 23,
-    "earliest_known_date": "2026-10-06",
+    "earliest_known_date": "2026-10-12",
     "lowest_known_price_gbp": 515.0
   },
   {
@@ -136,7 +136,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aa2b405c5796a7a179c6674/FRB_10.09.2026.pdf",
     "source_updated_date": "2026-09-10",
     "provider_count": 7,
-    "earliest_known_date": "2026-10-07",
+    "earliest_known_date": "2026-10-09",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -708,7 +708,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aad5df7086ce7c57b818713/AMC_18.09.26.pdf",
-    "source_updated_date": "2026-10-06",
+    "source_updated_date": "2026-10-07",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
