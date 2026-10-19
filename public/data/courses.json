@@ -66,7 +66,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a178e8ef5609e7c933c1/AFF_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 19,
-    "earliest_known_date": "2026-10-19",
+    "earliest_known_date": "2026-10-20",
     "lowest_known_price_gbp": 180.0
   },
   {
@@ -80,7 +80,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a35fab368efeb4c933b6/PSCRB_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 12,
-    "earliest_known_date": "2026-10-19",
+    "earliest_known_date": "2026-10-20",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -108,7 +108,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a2faab368efeb4c933af/MFA_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 24,
-    "earliest_known_date": "2026-10-19",
+    "earliest_known_date": "2026-10-21",
     "lowest_known_price_gbp": 450.0
   },
   {
@@ -122,7 +122,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a2edec9d3aba1e013a90/MC_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 15,
-    "earliest_known_date": "2026-10-19",
+    "earliest_known_date": "2026-10-20",
     "lowest_known_price_gbp": 599.0
   },
   {
@@ -192,7 +192,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a4c4f1ba855cc196a979/UPSCRB_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 12,
-    "earliest_known_date": "2026-10-19",
+    "earliest_known_date": "2026-11-09",
     "lowest_known_price_gbp": 299.0
   },
   {
@@ -469,8 +469,8 @@
     "category": "stcw_tanker",
     "description": null,
     "confusion_note": null,
-    "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a467b016250bca013a7f/TFF_08.10.2026.pdf",
-    "source_updated_date": "2026-10-08",
+    "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ad6009edfa45fcb6753cbd1/TFF_19.10.26.pdf",
+    "source_updated_date": "2026-10-19",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
