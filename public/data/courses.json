@@ -10,7 +10,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a386ab368efeb4c933bc/PST_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 36,
-    "earliest_known_date": "2026-10-22",
+    "earliest_known_date": "2026-10-23",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -24,7 +24,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a243e8ef5609e7c933c5/FPFF_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 24,
-    "earliest_known_date": "2026-10-22",
+    "earliest_known_date": "2026-10-26",
     "lowest_known_price_gbp": 165.0
   },
   {
@@ -38,7 +38,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a238ab368efeb4c933aa/EFA_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 42,
-    "earliest_known_date": "2026-10-22",
+    "earliest_known_date": "2026-10-24",
     "lowest_known_price_gbp": 120.0
   },
   {
@@ -52,8 +52,8 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a37bec9d3aba1e013a94/PSSR_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 31,
-    "earliest_known_date": "2026-10-23",
-    "lowest_known_price_gbp": 95.0
+    "earliest_known_date": "2026-10-26",
+    "lowest_known_price_gbp": 105.0
   },
   {
     "id": "aff",
@@ -80,7 +80,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a35fab368efeb4c933b6/PSCRB_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 12,
-    "earliest_known_date": "2026-10-22",
+    "earliest_known_date": "2026-10-26",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -136,7 +136,7 @@
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ac7a24df1ba855cc196a966/FRB_08.10.2026.pdf",
     "source_updated_date": "2026-10-08",
     "provider_count": 6,
-    "earliest_known_date": "2026-10-23",
+    "earliest_known_date": "2026-10-30",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -470,7 +470,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ad6009edfa45fcb6753cbd1/TFF_19.10.26.pdf",
-    "source_updated_date": "2026-10-22",
+    "source_updated_date": "2026-10-23",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
