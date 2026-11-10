@@ -8,9 +8,9 @@
     "description": "Covers survival at sea: lifejackets, immersion suits, life rafts, and firefighting basics. Required for most commercial certificates.",
     "confusion_note": "This is the initial PST course. If you need to renew an existing certificate, see Updating PST (UPST).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec80bb05bab4df5458aebc/PST_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 36,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-10",
     "lowest_known_price_gbp": 125.0
   },
   {
@@ -22,9 +22,9 @@
     "description": "Fire prevention and firefighting techniques. Covers fire theory, shipboard fire systems, and practical drills. Part of STCW Basic Safety Training.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8035b8bc728f5ca254d2/FPFF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 24,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-10",
     "lowest_known_price_gbp": 165.0
   },
   {
@@ -36,9 +36,9 @@
     "description": "Provides basic first aid skills for use at sea before medical help arrives. Covers CPR, burns, and casualty care.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec81c4912134d4c0b52f7a/EFA_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 42,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-10",
     "lowest_known_price_gbp": 120.0
   },
   {
@@ -50,9 +50,9 @@
     "description": "Covers personal safety procedures, onboard communication, and social responsibilities. Part of STCW Basic Safety Training.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8045b8bc728f5ca254d3/PSSR_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 32,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-10",
     "lowest_known_price_gbp": 95.0
   },
   {
@@ -64,9 +64,9 @@
     "description": "Advanced training in shipboard firefighting for designated firefighting team members.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec80c8b8bc728f5ca254d5/AFF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 19,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-10",
     "lowest_known_price_gbp": 40.0
   },
   {
@@ -78,9 +78,9 @@
     "description": "Advanced training in launching and operating survival craft and rescue boats.",
     "confusion_note": "This is the full (unrestricted) PSCRB. For the yacht-specific variant, see Yacht-Restricted PSCRB (PSCRB-R).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8152b8bc728f5ca254d6/PSCRB_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 12,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-11",
     "lowest_known_price_gbp": 185.0
   },
   {
@@ -92,7 +92,7 @@
     "description": "Yacht-specific variant of PSCRB, covering the survival craft found on smaller commercial yachts.",
     "confusion_note": "This is the yacht-restricted variant. For the full version, see Proficiency in Survival Craft and Rescue Boats (PSCRB).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83efa6223dfc6b58aec4/PSCRB-R_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -106,9 +106,9 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec815e912134d4c0b52f78/MFA_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 24,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-16",
     "lowest_known_price_gbp": 450.0
   },
   {
@@ -120,9 +120,9 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec80dc05bab4df5458aebd/MC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 15,
-    "earliest_known_date": "2026-11-09",
+    "earliest_known_date": "2026-11-16",
     "lowest_known_price_gbp": 599.0
   },
   {
@@ -134,10 +134,10 @@
     "description": "Training in operation and recovery of fast rescue boats, typically required for vessels carrying fast rescue boats.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec80d1d77f87d8c7b52f79/FRB_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 6,
-    "earliest_known_date": "2026-11-20",
-    "lowest_known_price_gbp": 220.0
+    "earliest_known_date": "2026-11-13",
+    "lowest_known_price_gbp": 185.0
   },
   {
     "id": "ufpff",
@@ -148,7 +148,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec823fbdbbd2ef07a254cf/UFPFF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 22,
     "earliest_known_date": "2026-11-11",
     "lowest_known_price_gbp": 385.0
@@ -162,7 +162,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec824abdbbd2ef07a254d0/UAFF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 19,
     "earliest_known_date": "2026-11-12",
     "lowest_known_price_gbp": 299.0
@@ -176,9 +176,9 @@
     "description": null,
     "confusion_note": "This is the refresher/updating course. For the initial certificate, see Personal Survival Techniques (PST).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec825405bab4df5458aebf/UPST_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 25,
-    "earliest_known_date": "2026-11-10",
+    "earliest_known_date": "2026-11-17",
     "lowest_known_price_gbp": 195.0
   },
   {
@@ -190,7 +190,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec82cabdbbd2ef07a254d1/UPSCRB_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 12,
     "earliest_known_date": "2026-11-16",
     "lowest_known_price_gbp": 299.0
@@ -204,7 +204,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8404d77f87d8c7b52f7f/UPSCRB-R_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -218,7 +218,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec80e9912134d4c0b52f77/UMC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 11,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -232,7 +232,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec82d6bdbbd2ef07a254d2/UFRB_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 7,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -246,7 +246,7 @@
     "description": "Basic security awareness training covering the ISPS Code, threat recognition, and reporting procedures.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec82de912134d4c0b52f7c/SA_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 23,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -260,7 +260,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec82e9a6223dfc6b58aec3/DSD_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 21,
     "earliest_known_date": "2026-11-11",
     "lowest_known_price_gbp": 220.0
@@ -274,7 +274,7 @@
     "description": "Ship Security Officer training covering security plans, drills, and coordination with port and company security.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec82f205bab4df5458aec0/SSO_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 8,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -288,7 +288,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec856ebdbbd2ef07a254d9/CSO_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -302,7 +302,7 @@
     "description": "General Operator Certificate for GMDSS (Global Maritime Distress and Safety System) radio communications.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8595d77f87d8c7b52f81/GOC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 17,
     "earliest_known_date": "2026-11-16",
     "lowest_known_price_gbp": 1575.0
@@ -316,7 +316,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec859c912134d4c0b52f86/ROC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 11,
     "earliest_known_date": "2026-11-13",
     "lowest_known_price_gbp": null
@@ -330,7 +330,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85a405bab4df5458aec5/LRC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 9,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -344,7 +344,7 @@
     "description": "Human Element, Leadership and Management — Officer of the Watch level. Covers communication, teamwork, and situational awareness.",
     "confusion_note": "HELM Operational is for officer of the watch level. For chief officer / master level, see HELM Management (HELM-M).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec81ddb8bc728f5ca254d8/HELM-O_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 21,
     "earliest_known_date": "2026-11-23",
     "lowest_known_price_gbp": 525.0
@@ -358,7 +358,7 @@
     "description": "Human Element, Leadership and Management — Chief Officer / Master level. Builds on HELM-O with leadership and management responsibilities.",
     "confusion_note": "HELM Management is for chief officer / master level. For OOW level, see HELM Operational (HELM-O).",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec81e6912134d4c0b52f7b/HELM-M_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 12,
     "earliest_known_date": "2026-11-16",
     "lowest_known_price_gbp": 850.0
@@ -372,7 +372,7 @@
     "description": "Training in Electronic Chart Display and Information Systems, required for navigating on vessels equipped with ECDIS.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8196912134d4c0b52f79/ECDIS_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 14,
     "earliest_known_date": "2026-11-23",
     "lowest_known_price_gbp": 1360.0
@@ -386,7 +386,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec818ca6223dfc6b58aebe/NAEST-O_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -400,7 +400,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83b405bab4df5458aec1/NAEST-M_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 4,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -414,7 +414,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8215a6223dfc6b58aec1/HV-O_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 8,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -428,7 +428,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8221a6223dfc6b58aec2/HV-M_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 7,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -442,7 +442,7 @@
     "description": null,
     "confusion_note": "This is the basic (entry-level) oil and chemical tanker course. For the advanced qualification, see Advanced Oil Tanker Training.",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8184a6223dfc6b58aebd/BASIC_OIL_+_CHEM_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -456,7 +456,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85f7912134d4c0b52f87/BASIC_GAS_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 7,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -470,7 +470,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6ad6009edfa45fcb6753cbd1/TFF_19.10.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -484,7 +484,7 @@
     "description": null,
     "confusion_note": "This is the advanced tanker training. For the entry-level course, see Basic Oil and Chemical Tanker Training.",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8168d77f87d8c7b52f7a/Adv_Oil_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -498,7 +498,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8172b8bc728f5ca254d7/Adv_Chem_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -512,7 +512,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec817a05bab4df5458aebe/Adv_Gas_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 4,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -526,7 +526,7 @@
     "description": null,
     "confusion_note": "Basic IGF Training is the entry-level qualification. For the senior officer qualification, see Advanced IGF Training.",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83bf05bab4df5458aec2/Basic_IGF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 8,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -540,7 +540,7 @@
     "description": null,
     "confusion_note": "Advanced IGF Training is the senior officer qualification. For entry-level, see Basic IGF Training.",
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8327bdbbd2ef07a254d4/ADV_IGF_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 6,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -554,7 +554,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8576b8bc728f5ca254dd/HYDROGEN_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -568,7 +568,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85d505bab4df5458aec8/Basic_Ammonia_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -582,7 +582,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85dda6223dfc6b58aeca/Adv_Ammonia_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -596,7 +596,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85e6b8bc728f5ca254e1/Basic_Methanol_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -610,7 +610,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85ef05bab4df5458aec9/Adv_Methanol_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -624,7 +624,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83a9d77f87d8c7b52f7d/BASIC_POLAR_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -638,7 +638,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83d6d77f87d8c7b52f7e/Adv_Polar_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -652,7 +652,7 @@
     "description": "Efficient Deck Hand — entry-level deck rating qualification covering watchkeeping, maintenance, and safety.",
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec81cca6223dfc6b58aec0/EDH_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 15,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -666,7 +666,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8587d77f87d8c7b52f80/YRC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -680,7 +680,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85b3bdbbd2ef07a254da/NWR_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -708,7 +708,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8600d77f87d8c7b52f83/AMC_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -722,7 +722,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec833dd77f87d8c7b52f7b/AEC1_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 18,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -736,7 +736,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8359bdbbd2ef07a254d5/AEC2_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 13,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -750,7 +750,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85c5b8bc728f5ca254e0/AEPC1_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 1,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -764,7 +764,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84ec912134d4c0b52f82/Yacht_GSK_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 5,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -778,7 +778,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec855f912134d4c0b52f84/Yacht_OOW_NavRad_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 4,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -792,7 +792,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84c6bdbbd2ef07a254d7/Yacht_BusLaw_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 5,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -806,7 +806,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84d0a6223dfc6b58aec8/Yacht_Master_NavRad_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 4,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -820,7 +820,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84da912134d4c0b52f81/Yacht_SeamanMet_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 5,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -834,7 +834,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84e3a6223dfc6b58aec9/Yacht_Stability_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 5,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -848,7 +848,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8458912134d4c0b52f80/SV_Workshop_Skills_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -862,7 +862,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec842d912134d4c0b52f7f/SV_AUX_1_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -876,7 +876,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8464b8bc728f5ca254db/SV_Marine_Diesel_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -890,7 +890,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec84bcb8bc728f5ca254dc/SV_Op_Pro_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -904,7 +904,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec844c05bab4df5458aec3/SV_Chief_Stat_Ops_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -918,7 +918,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8421a6223dfc6b58aec6/SV_Applied_ME_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -932,7 +932,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8440b8bc728f5ca254da/SV_AUX_2_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -946,7 +946,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8567bdbbd2ef07a254d8/GES_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -960,7 +960,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec839ed77f87d8c7b52f7c/CMHB_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 9,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -974,7 +974,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec8417b8bc728f5ca254d9/PAX_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -988,7 +988,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85ab05bab4df5458aec6/Ship_Safety_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -1002,7 +1002,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec83faa6223dfc6b58aec5/SSNR_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 7,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -1016,7 +1016,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec857f912134d4c0b52f85/STABILITY_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 8,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -1030,7 +1030,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec85cc05bab4df5458aec7/MASS_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 3,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
@@ -1044,7 +1044,7 @@
     "description": null,
     "confusion_note": null,
     "source_pdf_url": "https://assets.publishing.service.gov.uk/media/6aec858eb8bc728f5ca254de/HELIDECK_05.11.26.pdf",
-    "source_updated_date": "2026-11-09",
+    "source_updated_date": "2026-11-10",
     "provider_count": 2,
     "earliest_known_date": null,
     "lowest_known_price_gbp": null
